@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vista Service Daily TCHA Exclusion</title>
+    <!-- Highcharts Library -->
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <style>
+        /* --- CSS VARIABLES & RESET --- */
+        :root {
+            --color-blue: #2549A0;
+            --color-blue-light: #eef2ff;
+            --color-blue-dark: #1a3678;
+            --color-green: #78DD12;
+            --color-green-dark: #5cb00d;
+            --color-gray-light: #f4f6f8;
+            --color-gray-border: #e5e7eb;
+            --color-text: #333333;
+            --color-text-light: #666666;
+            --color-white: #ffffff;
+            --color-danger: #e74c3c;
+            --shadow-card: 0 4px 6px rgba(0,0,0,0.05);
+            --shadow-modal: 0 10px 25px rgba(0,0,0,0.2);
+            --radius: 6px;
+            --font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+        
+        body {
+            font-family: var(--font-family);
+            background-color: var(--color-gray-light);
+            color: var(--color-text);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- UTILITY CLASSES --- */
+        .hidden { display: none !important; }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-center { justify-content: center; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-4 { gap: 1rem; }
+        .w-full { width: 100%; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .mt-4 { margin-top: 1rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .p-4 { padding: 1rem; }
+        
+        /* --- BUTTONS --- */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-primary { background-color: var(--color-green); color: var(--color-white); }
+        .btn-primary:hover { background-color: var(--color-green-dark); }
+        .btn-secondary { background-color: var(--color-blue); color: var(--color-white); }
+        .btn-secondary:hover { background-color: var(--color-blue-dark); }
+        .btn-outline { background-color: transparent; border: 1px solid var(--color-gray-border); color: var(--color-text); }
+        .btn-outline:hover { background-color: #f9f9f9; }
+        .btn-danger { background-color: var(--color-danger); color: white; }
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+        /* --- FORMS --- */
+        .form-group { margin-bottom: 1rem; text-align: left; }
+        .form-label { display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 14px; color: var(--color-text-light); }
+        .form-input, .form-select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--color-gray-border);
+            border-radius: var(--radius);
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        .form-input:focus { border-color: var(--color-blue); }
+        
+        /* Grid for Inputs */
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+        }
+        .input-item { display: flex; flex-direction: column; }
+        .input-item label { font-size: 12px; margin-bottom: 4px; color: var(--color-text-light); }
+
+        /* --- LAYOUTS --- */
+        .login-view {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--color-blue) 0%, #1a3a85 100%);
+        }
+        .login-card {
+            background: var(--color-white);
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow-modal);
+            width: 100%;
+            max-width: 450px;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        /* --- NEW TOP NAVIGATION (PROFESSIONAL) --- */
+        .app-container { 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; 
+            width: 100vw; 
+        }
+        .top-nav {
+            height: 80px; /* Increased height for space */
+            background: var(--color-white);
+            box-shadow: 0 1px 0 rgba(0,0,0,0.03);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            z-index: 100;
+        }
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            color: var(--color-blue);
+            font-size: 18px;
+            min-width: 200px;
+        }
+        .nav-links { 
+            display: flex; 
+            gap: 1px; 
+            flex: 1;
+            justify-content: center;
+        }
+        
+        .nav-box {
+            padding: 0 35px; /* Increased horizontal space */
+            background-color: white;
+            border: 1px solid transparent; 
+            border-radius: 0;
+            color: var(--color-text-light);
+            font-weight: 700; /* Bolder */
+            font-size: 15px; /* Slightly larger text */
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            height: 100%;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .nav-separator {
+            width: 1px;
+            height: 30px; /* Taller line */
+            background-color: var(--color-gray-border);
+        }
+        
+        .nav-box:hover, .nav-box.active {
+            background-color: var(--color-blue-light);
+            color: var(--color-blue);
+            border-bottom: 3px solid var(--color-blue); /* Thicker highlight */
+        }
+
+        .nav-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding-left: 20px;
+            border-left: 1px solid #eee;
+            min-width: 200px;
+            justify-content: flex-end;
+        }
+        .nav-profile-info {
+            text-align: right;
+        }
+        .nav-name { font-weight: 600; font-size: 14px; color: var(--color-text); }
+        .nav-role { font-size: 11px; color: var(--color-text-light); text-transform: uppercase; }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background-color: var(--color-gray-light);
+        }
+        .content-area {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        /* Page Title inside content area now */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        .page-title { font-size: 1.5rem; font-weight: 700; color: var(--color-blue); }
+
+        /* Cards & Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: var(--color-white);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-card);
+            border-left: 4px solid var(--color-blue);
+            transition: transform 0.2s;
+        }
+        .stat-card:hover { transform: translateY(-3px); }
+        .stat-value { font-size: 2rem; font-weight: 700; color: var(--color-text); margin: 0.5rem 0; }
+        .stat-label { font-size: 0.9rem; color: var(--color-text-light); }
+
+        /* Tables */
+        .table-container {
+            background: var(--color-white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-card);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--color-gray-border); font-size: 14px; }
+        th { background-color: #f8f9fa; font-weight: 600; color: var(--color-text-light); }
+        tr:last-child td { border-bottom: none; }
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-active { background-color: #e6fffa; color: #2c7a7b; }
+        .status-inactive { background-color: #fff5f5; color: #c53030; }
+
+        /* --- CHARTS AREA (SPACIOUS) --- */
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); /* Wider columns */
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .chart-card {
+            background: var(--color-white);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-card);
+            /* Increased height to fit charts properly */
+            min-height: 550px; 
+            max-height: 650px;
+            display: flex;
+            flex-direction: column;
+        }
+        .chart-title { font-weight: 600; margin-bottom: 1rem; color: var(--color-blue); font-size: 16px;}
+        
+        /* Highcharts Container */
+        .highcharts-figure {
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(2px);
+        }
+        .modal {
+            background: var(--color-white);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-modal);
+            animation: slideUp 0.2s ease-out;
+        }
+        .modal-header { padding: 1.5rem; border-bottom: 1px solid var(--color-gray-border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-body { padding: 1.5rem; }
+        .modal-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--color-gray-border); display: flex; justify-content: flex-end; gap: 10px; }
+        .close-modal { cursor: pointer; font-size: 24px; color: #999; }
+
+        /* Toast */
+        .toast-container {
+            position: fixed; bottom: 20px; right: 20px; z-index: 2000;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .toast {
+            background: var(--color-white);
+            border-left: 4px solid var(--color-blue);
+            padding: 15px 20px;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex; align-items: center; gap: 10px;
+            animation: slideUp 0.3s ease-out;
+            min-width: 300px;
+        }
+        .toast.success { border-color: var(--color-green); }
+        .toast.error { border-color: var(--color-danger); }
+
+        /* Animations */
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        /* Code Block */
+        pre { background: #2d2d2d; color: #ccc; padding: 1rem; border-radius: 6px; overflow-x: auto; font-size: 12px; }
+        
+        #app {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Custom Row Table Style */
+        .custom-row td {
+            background-color: #f0fdf4;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <!-- --- APP ROOT --- -->
+    <div id="app"></div>
+
+    <!-- --- TOAST CONTAINER --- -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- --- MODALS --- -->
+    <div id="modal-container"></div>
+
+    <script>
+        /* --- MOCK DATA & STATE --- */
+        const MOCK_DB = {
+            users: [
+                { id: 1, name: 'Admin User', email: 'admin@iranvs.ir', password: '1qaz!QAZ', role: 'admin', status: 'active', forcePwChange: false },
+                { id: 2, name: 'Test User', email: 'user@iranvs.ir', password: '1qaz!QAZ', role: 'user', status: 'active', forcePwChange: true }
+            ],
+            logs: [],
+            processedData: {} 
+        };
+
+        // Generate some initial logs for dashboard
+        for(let i=0; i<50; i++) {
+            MOCK_DB.logs.push({
+                id: Date.now() - i * 100000,
+                userId: i % 2 === 0 ? 1 : 2,
+                action: i % 3 === 0 ? 'Login' : 'Export',
+                timestamp: new Date(Date.now() - i * 100000 * 5).toISOString(),
+                status: 'Success'
+            });
+        }
+
+        const STATE = {
+            currentUser: null,
+            currentView: 'login',
+            selectedDate: new Date().toISOString().split('T')[0]
+        };
+
+        /* --- AUTO LOGOUT TIMER (10 Mins) --- */
+        const IDLE_TIMEOUT = 10 * 60 * 1000;
+        let idleTimer = null;
+
+        function resetIdleTimer() {
+            if (STATE.currentUser) {
+                clearTimeout(idleTimer);
+                idleTimer = setTimeout(() => {
+                    Auth.logout();
+                    Toast.show('You were logged out due to inactivity.', 'error');
+                }, IDLE_TIMEOUT);
+            }
+        }
+
+        document.addEventListener('mousemove', resetIdleTimer);
+        document.addEventListener('keypress', resetIdleTimer);
+        document.addEventListener('click', resetIdleTimer);
+        document.addEventListener('scroll', resetIdleTimer);
+
+        /* --- CORE SYSTEM --- */
+        const App = {
+            init() {
+                this.render();
+                this.bindEvents();
+            },
+
+            render() {
+                const app = document.getElementById('app');
+                if (!app) return;
+
+                if (STATE.currentView === 'login') {
+                    app.innerHTML = this.renderLogin();
+                } else {
+                    app.innerHTML = this.renderDashboard();
+                    this.updateNavUI();
+                    this.loadView(STATE.currentUser.role === 'admin' ? 'admin-dash' : 'user-results');
+                }
+            },
+
+            renderLogin() {
+                return `
+                    <div class="login-view">
+                        <div class="login-card">
+                            <div class="text-center mb-4">
+                                <div style="width: 80px; height: 80px; margin: 0 auto 1rem; background: linear-gradient(135deg, var(--color-blue), var(--color-green)); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 24px;">
+                                    VISTA
+                                </div>
+                                <h2 style="color: var(--color-blue); margin-top: 1rem;">Vista Service Daily TCHA Exclusion</h2>
+                                <p style="color: var(--color-text-light); font-size: 14px;">NPM Team Platform</p>
+                            </div>
+                            <form id="login-form">
+                                <div class="form-group">
+                                    <label class="form-label">Email Address (@iranvs.ir)</label>
+                                    <input type="email" id="login-email" class="form-input" placeholder="admin@iranvs.ir" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Password</label>
+                                    <input type="password" id="login-password" class="form-input" placeholder="•••••" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-full">Sign In</button>
+                            </form>
+                            <div class="mt-4 text-center">
+                                <a href="#" id="forgot-pw-link" style="font-size: 13px; color: var(--color-blue);">Forgot Password?</a>
+                            </div>
+                            <div style="margin-top: 1.5rem; padding: 10px; background: #eef2ff; border-radius: 6px; font-size: 12px; color: var(--color-text-light);">
+                                <strong>Demo Credentials:</strong>
+                                <ul style="padding-left: 20px; margin-top: 5px;">
+                                    <li>Admin: admin@iranvs.ir / 1qaz!QAZ</li>
+                                    <li>User: user@iranvs.ir / 1qaz!QAZ</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            },
+
+            renderDashboard() {
+                return `
+                    <div class="app-container">
+                        <header class="top-nav">
+                            <div class="nav-brand">
+                                <div style="width: 35px; height: 35px; background: linear-gradient(135deg, var(--color-blue), var(--color-green)); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 16px;">V</div>
+                                <span>VISTA SERVICES</span>
+                            </div>
+                            <nav class="nav-links" id="nav-links"></nav>
+                            <div class="nav-profile">
+                                <div class="nav-profile-info">
+                                    <div id="user-name" class="nav-name">User Name</div>
+                                    <div id="user-role" class="nav-role">Role</div>
+                                </div>
+                                <button id="logout-btn" class="btn btn-sm btn-outline">Logout</button>
+                            </div>
+                        </header>
+                        <main class="main-content">
+                            <div class="content-area">
+                                <div class="page-header">
+                                    <h2 id="page-title" class="page-title">Dashboard</h2>
+                                    <div id="top-actions"></div>
+                                </div>
+                                <div id="view-content"></div>
+                            </div>
+                        </main>
+                    </div>
+                `;
+            },
+
+            bindEvents() {
+                document.addEventListener('click', (e) => {
+                    if (e.target.id === 'logout-btn') Auth.logout();
+                    if (e.target.id === 'forgot-pw-link') {
+                        e.preventDefault();
+                        Modals.forgotPassword();
+                    }
+                });
+
+                document.addEventListener('submit', (e) => {
+                    if (e.target && e.target.id === 'login-form') {
+                        e.preventDefault();
+                        const email = document.getElementById('login-email');
+                        const password = document.getElementById('login-password');
+                        if (email && password) {
+                            Auth.login(email.value, password.value);
+                        }
+                    }
+                });
+            },
+
+            updateNavUI() {
+                if (STATE.currentUser) {
+                    document.getElementById('user-name').textContent = STATE.currentUser.name;
+                    document.getElementById('user-role').textContent = STATE.currentUser.role;
+                    
+                    const topActions = document.getElementById('top-actions');
+                    if (topActions && STATE.currentUser.role === 'admin') {
+                        topActions.innerHTML = '';
+                        const btn = document.createElement('button');
+                        btn.className = 'btn btn-sm btn-outline';
+                        btn.innerHTML = 'Dev Info';
+                        btn.onclick = () => Modals.devInfo();
+                        topActions.appendChild(btn);
+                    }
+                }
+            },
+
+            loadView(viewId) {
+                STATE.currentView = viewId;
+                
+                const nav = document.getElementById('nav-links');
+                if(nav) {
+                    nav.innerHTML = '';
+                    const links = STATE.currentUser.role === 'admin' ? [
+                        { id: 'admin-dash', label: 'Dashboard' },
+                        { id: 'user-mgmt', label: 'Users' },
+                        { id: 'data-upload', label: 'Upload' },
+                        { id: 'user-results', label: 'Results' }
+                    ] : [
+                        { id: 'user-results', label: 'Results' }
+                    ];
+
+                    links.forEach((link, index) => {
+                        const div = document.createElement('div');
+                        div.className = `nav-box ${STATE.currentView === link.id ? 'active' : ''}`;
+                        div.innerHTML = `<span style="font-size:14px;">${link.label}</span>`;
+                        div.onclick = () => this.loadView(link.id);
+                        nav.appendChild(div);
+                        if (index < links.length - 1) {
+                            const sep = document.createElement('div');
+                            sep.className = 'nav-separator';
+                            nav.appendChild(sep);
+                        }
+                    });
+                }
+
+                const content = document.getElementById('view-content');
+                const title = document.getElementById('page-title');
+                if(!content || !title) return;
+                
+                content.innerHTML = '';
+
+                switch(viewId) {
+                    case 'admin-dash':
+                        title.textContent = 'Admin Dashboard';
+                        Views.AdminDash(content);
+                        break;
+                    case 'user-mgmt':
+                        title.textContent = 'User Management';
+                        Views.UserMgmt(content);
+                        break;
+                    case 'data-upload':
+                        title.textContent = 'Data Upload';
+                        Views.DataUpload(content);
+                        break;
+                    case 'user-results':
+                        title.textContent = 'Results Overview';
+                        Views.UserResults(content);
+                        break;
+                }
+            }
+        };
+
+        /* --- AUTH CONTROLLER --- */
+        const Auth = {
+            login(email, password) {
+                const user = MOCK_DB.users.find(u => u.email === email && u.password === password);
+                if (user) {
+                    if (user.status === 'inactive') {
+                        Toast.show('Account is deactivated. Contact Admin.', 'error');
+                        return;
+                    }
+                    if (user.forcePwChange) {
+                        Modals.forcePasswordChange(user);
+                        return;
+                    }
+                    this.completeLogin(user);
+                } else {
+                    Toast.show('Invalid credentials', 'error');
+                }
+            },
+            
+            completeLogin(user) {
+                STATE.currentUser = user;
+                STATE.currentView = 'dashboard';
+                Logger.log(user.id, 'Login', 'Success');
+                Toast.show(`Welcome, ${user.name}!`, 'success');
+                resetIdleTimer();
+                App.render();
+            },
+
+            logout() {
+                if (STATE.currentUser) {
+                    Logger.log(STATE.currentUser.id, 'Logout', 'Success');
+                }
+                STATE.currentUser = null;
+                STATE.currentView = 'login';
+                clearTimeout(idleTimer);
+                App.render();
+            }
+        };
+
+        /* --- LOGGER --- */
+        const Logger = {
+            log(userId, action, status) {
+                MOCK_DB.logs.unshift({
+                    id: Date.now(),
+                    userId,
+                    action,
+                    timestamp: new Date().toISOString(),
+                    status
+                });
+            }
+        };
+
+        /* --- UI VIEWS --- */
+        const Views = {
+            AdminDash(container) {
+                const today = new Date().toLocaleDateString();
+                container.innerHTML = `
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Total Users</div>
+                            <div class="stat-value">${MOCK_DB.users.length}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Today's Date</div>
+                            <div class="stat-value" style="font-size: 1.5rem">${today}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">System Status</div>
+                            <div class="stat-value" style="color: var(--color-green); font-size: 1.5rem;">Operational</div>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <div class="flex justify-between items-center p-4" style="background: #f8f9fa; border-bottom: 1px solid #eee;">
+                            <h3>Recent Activity Logs</h3>
+                            <div class="flex gap-2">
+                                <input type="date" id="log-start" class="form-input" style="width: auto;">
+                                <input type="date" id="log-end" class="form-input" style="width: auto;">
+                                <button class="btn btn-sm btn-secondary" onclick="Actions.filterLogs()">Filter</button>
+                                <button class="btn btn-sm btn-outline" onclick="Actions.exportLogs()">Export</button>
+                            </div>
+                        </div>
+                        <div style="max-height: 400px; overflow-y: auto;">
+                            <table id="logs-table">
+                                <thead><tr><th>User</th><th>Action</th><th>Timestamp</th><th>Status</th></tr></thead>
+                                <tbody id="logs-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+                Actions.renderLogs(MOCK_DB.logs.slice(0, 100));
+            },
+
+            UserMgmt(container) {
+                const tableRows = MOCK_DB.users.map(u => `
+                    <tr>
+                        <td>${u.name}</td>
+                        <td>${u.email}</td>
+                        <td><span class="status-badge ${u.status === 'active' ? 'status-active' : 'status-inactive'}">${u.status}</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline" onclick="Modals.resetPw(${u.id})">Reset PW</button>
+                            <button class="btn btn-sm btn-outline" onclick="Actions.toggleUserStatus(${u.id})">${u.status === 'active' ? 'Deactivate' : 'Activate'}</button>
+                            <button class="btn btn-sm btn-outline" onclick="Actions.exportUserLog(${u.id})">Export Logs</button>
+                            ${u.role !== 'admin' ? `<button class="btn btn-sm btn-danger" onclick="Actions.deleteUser(${u.id})">Delete</button>` : ''}
+                        </td>
+                    </tr>
+                `).join('');
+
+                container.innerHTML = `
+                    <div class="flex justify-between mb-4">
+                        <div class="flex gap-2">
+                            <button class="btn btn-primary" onclick="Modals.createUser()">+ Create User</button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead><tr><th>Name</th><th>Email</th><th>Status</th><th>Actions</th></tr></thead>
+                            <tbody>${tableRows}</tbody>
+                        </table>
+                    </div>
+                `;
+            },
+
+            DataUpload(container) {
+                container.innerHTML = `
+                    <div class="stat-card" style="max-width: 800px; margin: 0 auto;">
+                        <h3 class="mb-4">Upload Incident Ticket Data</h3>
+                        <form id="upload-form">
+                            <div class="form-group">
+                                <label class="form-label">Select Date</label>
+                                <input type="date" id="upload-date" class="form-input" required value="${STATE.selectedDate}">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Enter Target TCHA (Availability %) per Technology</label>
+                                <div class="input-grid">
+                                    <div class="input-item"><label>2G TCHA</label><input type="number" id="tcha-2g" step="0.01" class="form-input" placeholder="98.56" required></div>
+                                    <div class="input-item"><label>3G TCHA</label><input type="number" id="tcha-3g" step="0.01" class="form-input" placeholder="96.56" required></div>
+                                    <div class="input-item"><label>4G TCHA</label><input type="number" id="tcha-4g" step="0.01" class="form-input" placeholder="98.05" required></div>
+                                    <div class="input-item"><label>TDD TCHA</label><input type="number" id="tcha-tdd" step="0.01" class="form-input" placeholder="90.00" required></div>
+                                    <div class="input-item"><label>5G TCHA</label><input type="number" id="tcha-5g" step="0.01" class="form-input" placeholder="98.16" required></div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">TT File (Excel)</label>
+                                <input type="file" id="tt-file" class="form-input" accept=".xlsx, .xls" required>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <button type="submit" class="btn btn-primary">Process ETL & Upload</button>
+                                <button type="button" class="btn btn-outline" onclick="Modals.uploadSubRoot()">Upload SubRootcuz.xlsx</button>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    <div id="etl-log-area" class="mt-4 hidden">
+                        <h4>ETL Log:</h4>
+                        <pre style="height: 200px;"></pre>
+                    </div>
+                `;
+                
+                setTimeout(() => {
+                    const form = document.getElementById('upload-form');
+                    if(form) {
+                        form.addEventListener('submit', (e) => {
+                            e.preventDefault();
+                            const tchaValues = {
+                                '2G': parseFloat(document.getElementById('tcha-2g').value) || 0,
+                                '3G': parseFloat(document.getElementById('tcha-3g').value) || 0,
+                                '4G': parseFloat(document.getElementById('tcha-4g').value) || 0,
+                                'TDD': parseFloat(document.getElementById('tcha-tdd').value) || 0,
+                                '5G': parseFloat(document.getElementById('tcha-5g').value) || 0,
+                            };
+                            const date = document.getElementById('upload-date').value;
+                            ETLService.simulateProcess(date, tchaValues);
+                        });
+                    }
+                }, 100);
+            },
+
+            UserResults(container) {
+                container.innerHTML = `
+                    <div class="flex justify-between items-center mb-4 flex-wrap" style="gap: 10px;">
+                        <div class="flex items-center gap-4">
+                            <div>
+                                <label class="form-label" style="display:inline-block; margin-right: 10px;">Select Date:</label>
+                                <input type="date" id="result-date" class="form-input" style="width: auto;" value="${STATE.selectedDate}">
+                            </div>
+                            <button class="btn btn-secondary" onclick="Modals.addCustomRow()">+ Add Custom Exclusion</button>
+                        </div>
+                        <div class="flex gap-2" style="flex-wrap: wrap;">
+                            <button class="btn btn-primary" onclick="Actions.downloadResult()">Download Result</button>
+                            <button class="btn btn-outline" onclick="Actions.downloadTickets()">Download Tickets</button>
+                        </div>
+                    </div>
+                    
+                    <div id="results-content"></div>
+                `;
+                
+                const dateInput = document.getElementById('result-date');
+                if(dateInput) {
+                    dateInput.addEventListener('change', (e) => {
+                        STATE.selectedDate = e.target.value;
+                        this.renderResultsContent(document.getElementById('results-content'));
+                    });
+                }
+
+                this.renderResultsContent(document.getElementById('results-content'));
+            },
+
+            renderResultsContent(container) {
+                if (!container) return;
+                
+                const data = MOCK_DB.processedData[STATE.selectedDate];
+                
+                if (!data) {
+                    container.innerHTML = `<div class="text-center p-4" style="background: white; border-radius: 8px;">
+                        <h3>No Data Available</h3>
+                        <p>Please select a different date or contact Admin to upload data for ${STATE.selectedDate}.</p>
+                    </div>`;
+                    return;
+                }
+
+                // Render Table
+                const baseRows = data.rows.map(row => this.renderRow(row, false)).join('');
+                const customRows = (data.customRows || []).map(row => this.renderRow(row, true)).join('');
+
+                const tableHTML = `
+                    <div class="table-container mb-4">
+                        <h3 class="p-4" style="background: #f8f9fa; border-bottom: 1px solid #eee;">Outage Summary - ${STATE.selectedDate}</h3>
+                        <div style="overflow-x: auto;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Category / TCHA</th>
+                                    <th>2G Excluded</th>
+                                    <th>3G Excluded</th>
+                                    <th>4G Excluded</th>
+                                    <th>TDD Excluded</th>
+                                    <th>5G Excluded</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>TCHA (Base)</strong></td>
+                                    <td>${data.tcha['2G']}</td>
+                                    <td>${data.tcha['3G']}</td>
+                                    <td>${data.tcha['4G']}</td>
+                                    <td>${data.tcha['TDD']}</td>
+                                    <td>${data.tcha['5G']}</td>
+                                </tr>
+                                ${baseRows}
+                                ${customRows}
+                            </tbody>
+                        </table>
+                        </div>
+                    </div>
+                `;
+
+                // Render Highcharts
+                let chartsHTML = `<div class="charts-container">`;
+                ['2G', '3G', '4G', 'TDD', '5G'].forEach(tech => {
+                    chartsHTML += ChartsService.generateDonutCard(tech, data.charts[tech]);
+                });
+                chartsHTML += `</div>`;
+
+                container.innerHTML = tableHTML + chartsHTML;
+                
+                // Initialize charts after DOM insertion
+                setTimeout(() => {
+                    ['2G', '3G', '4G', 'TDD', '5G'].forEach(tech => {
+                        ChartsService.renderChart(`chart-${tech}`, tech, data.charts[tech]);
+                    });
+                }, 100);
+            },
+
+            renderRow(row, isCustom) {
+                return `
+                    <tr class="${isCustom ? 'custom-row' : ''}">
+                        <td>${row.category} ${isCustom ? '(Custom)' : ''}</td>
+                        <td>${row.vals['2G']}</td>
+                        <td>${row.vals['3G']}</td>
+                        <td>${row.vals['4G']}</td>
+                        <td>${row.vals['TDD']}</td>
+                        <td>${row.vals['5G']}</td>
+                    </tr>
+                `;
+            }
+        };
+
+        /* --- ETL LOGIC (SIMULATED) --- */
+        const ETLService = {
+            simulateProcess(date, tchaValues) {
+                const logArea = document.querySelector('#etl-log-area pre');
+                const container = document.getElementById('etl-log-area');
+                if (!logArea || !container) return;
+                
+                container.classList.remove('hidden');
+                logArea.textContent = 'Initializing ETL Process...\n';
+
+                const steps = [
+                    'Reading TT file...',
+                    'Validating columns: Fault First Occur Time, Recovery Time...',
+                    `Parsing date boundaries for ${date}...`,
+                    'Calculating MTTR (Mean Time To Repair)...',
+                    'Merging with SubRootcuz.xlsx lookup...',
+                    'Filtering empty Site Province rows...',
+                    'Calculating Outages based on provided TCHA values...',
+                    'Generating Tracker File...',
+                    'Process Complete. Database updated.'
+                ];
+
+                let i = 0;
+                const interval = setInterval(() => {
+                    if (i < steps.length) {
+                        logArea.textContent += `[${new Date().toLocaleTimeString()}] ${steps[i]}\n`;
+                        logArea.scrollTop = logArea.scrollHeight;
+                        i++;
+                    } else {
+                        clearInterval(interval);
+                        this.generateMockData(date, tchaValues);
+                        
+                        Actions.downloadETLLog(date);
+
+                        Toast.show('ETL Process Successful! Log downloaded.', 'success');
+                        setTimeout(() => {
+                            container.classList.add('hidden');
+                        }, 2000);
+                    }
+                }, 600);
+            },
+
+            generateMockData(date, tchaValues) {
+                const KNOWN_CATEGORIES = ['power', 'NOA', 'Non Telecom', 'PA / UA', 'Spare', 'Third Party'];
+                const FINAL_CATEGORIES = [...KNOWN_CATEGORIES, 'Others'];
+                const techs = ['2G', '3G', '4G', 'TDD', '5G'];
+
+                // Simulate Raw Data
+                const rawOutageData = [];
+                for(let i=0; i<50; i++) {
+                    const tech = techs[i % techs.length];
+                    let cat;
+                    if (Math.random() > 0.2) {
+                        cat = KNOWN_CATEGORIES[i % KNOWN_CATEGORIES.length];
+                    } else {
+                        cat = `Unknown Cause ${Math.floor(Math.random()*10)}`;
+                    }
+                    const outage = Math.floor(Math.random() * 800) + 100;
+                    rawOutageData.push({ tech, cat, outage });
+                }
+
+                const aggregatedData = {};
+                FINAL_CATEGORIES.forEach(c => {
+                    aggregatedData[c] = { totalOutage: 0, count: 0 };
+                });
+
+                rawOutageData.forEach(d => {
+                    let bucketKey = KNOWN_CATEGORIES.includes(d.cat) ? d.cat : 'Others';
+                    aggregatedData[bucketKey].totalOutage += d.outage;
+                    aggregatedData[bucketKey].count += 1;
+                });
+
+                const totalOutagePerTech = {};
+                techs.forEach(t => {
+                    let sum = 0;
+                    FINAL_CATEGORIES.forEach(c => {
+                        sum += aggregatedData[c].totalOutage; 
+                    });
+                    totalOutagePerTech[t] = sum / techs.length;
+                });
+
+                const rows = FINAL_CATEGORIES.map(cat => {
+                    const vals = {};
+                    techs.forEach(tech => {
+                        const outage = aggregatedData[cat].totalOutage / techs.length;
+                        const total = totalOutagePerTech[tech];
+                        const tcha = tchaValues[tech] || 0;
+                        const exclusion = tcha + (outage * (100 - tcha) / total);
+                        vals[tech] = exclusion.toFixed(2);
+                    });
+                    return { 
+                        category: cat, 
+                        vals,
+                        baseOutage: aggregatedData[cat].totalOutage / techs.length
+                    };
+                });
+
+                const chartData = {};
+                techs.forEach(tech => {
+                    chartData[tech] = FINAL_CATEGORIES.map(cat => {
+                        const outage = aggregatedData[cat].totalOutage / techs.length;
+                        const total = totalOutagePerTech[tech];
+                        const percentage = (outage / total) * 100;
+                        return {
+                            label: cat,
+                            value: percentage,
+                            baseOutage: outage
+                        };
+                    });
+                });
+
+                MOCK_DB.processedData[date] = {
+                    tcha: tchaValues,
+                    rows,
+                    availableCategories: FINAL_CATEGORIES,
+                    totalOutagePerTech,
+                    customRows: [],
+                    charts: chartData
+                };
+
+                Logger.log(STATE.currentUser.id, 'Upload Data', 'Success');
+            }
+        };
+
+        /* --- CHART SERVICE (HIGHCHARTS) --- */
+        const ChartsService = {
+            // Vista Color Palette
+            VISTA_COLORS: ['#2549A0', '#78DD12', '#2549A0', '#F59E0B', '#9C27B0', '#00BCD4', '#888888'],
+
+            generateDonutCard(tech, data) {
+                const chartId = `chart-${tech}`;
+                
+                return `
+                    <div class="chart-card">
+                        <div class="chart-title">${tech} Outage Distribution</div>
+                        <div id="${chartId}" style="width: 100%; height: 400px;"></div>
+                    </div>
+                `;
+            },
+
+            renderChart(containerId, tech, data) {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+                
+                // Map data to Highcharts format
+                const seriesData = data.map((d, i) => {
+                    let color = this.VISTA_COLORS[i % this.VISTA_COLORS.length];
+                    if (d.label === 'Others') color = '#888888';
+                    return {
+                        name: d.label,
+                        y: parseFloat(d.value.toFixed(2)),
+                        color: color
+                    };
+                });
+
+                Highcharts.chart(containerId, {
+                    chart: {
+                        type: 'pie',
+                        backgroundColor: null // Transparent background for card
+                    },
+                    title: {
+                        text: null
+                    },
+                    tooltip: {
+                        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                    },
+                    plotOptions: {
+                        pie: {
+                            allowPointSelect: true,
+                            cursor: 'pointer',
+                            innerSize: '60%', // Donut hole size
+                            dataLabels: [{
+                                enabled: true,
+                                format: '{point.percentage:.1f} %',
+                                distance: -30,
+                                style: {
+                                    color: 'white',
+                                    fontWeight: 'bold',
+                                    textOutline: 'none',
+                                    opacity: 1,
+                                    fontSize: '14px'
+                                },
+                                filter: {
+                                    operator: '>',
+                                    property: 'percentage',
+                                    value: 10
+                                }
+                            }]
+                        }
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    series: [{
+                        name: 'Outage',
+                        colorByPoint: false, // We use explicit colors
+                        data: seriesData
+                    }]
+                });
+            }
+        };
+
+        /* --- ACTIONS & MODALS --- */
+        const Actions = {
+            toggleUserStatus(id) {
+                const user = MOCK_DB.users.find(u => u.id === id);
+                if (user) {
+                    user.status = user.status === 'active' ? 'inactive' : 'active';
+                    App.loadView('user-mgmt');
+                    Toast.show(`User ${user.status}`, 'success');
+                }
+            },
+            deleteUser(id) {
+                if(confirm('Are you sure?')) {
+                    MOCK_DB.users = MOCK_DB.users.filter(u => u.id !== id);
+                    App.loadView('user-mgmt');
+                }
+            },
+            renderLogs(logs) {
+                const tbody = document.getElementById('logs-body');
+                if(!tbody) return;
+                tbody.innerHTML = logs.map(l => {
+                    const user = MOCK_DB.users.find(u => u.id === l.userId);
+                    return `
+                        <tr>
+                            <td>${user ? user.email : 'Unknown'}</td>
+                            <td>${l.action}</td>
+                            <td>${new Date(l.timestamp).toLocaleString()}</td>
+                            <td><span class="status-badge ${l.status === 'Success' ? 'status-active' : 'status-inactive'}">${l.status}</span></td>
+                        </tr>
+                    `;
+                }).join('');
+            },
+            filterLogs() {
+                const start = document.getElementById('log-start').value;
+                const end = document.getElementById('log-end').value;
+                if (!start || !end) {
+                    this.renderLogs(MOCK_DB.logs.slice(0, 100));
+                    return;
+                }
+                const filtered = MOCK_DB.logs.filter(l => {
+                    const d = new Date(l.timestamp).toISOString().split('T')[0];
+                    return d >= start && d <= end;
+                });
+                this.renderLogs(filtered);
+                Toast.show(`Found ${filtered.length} logs`, 'success');
+            },
+            exportLogs() {
+                Toast.show('Exporting All Logs...', 'success');
+            },
+            exportUserLog(userId) {
+                const user = MOCK_DB.users.find(u => u.id === userId);
+                const userLogs = MOCK_DB.logs.filter(l => l.userId === userId);
+                const filename = `User_Logs_${user.email}_${new Date().toISOString().split('T')[0]}.xlsx`;
+                Toast.show(`Exporting ${userLogs.length} logs for ${user.name}...`, 'success');
+            },
+            downloadETLLog(date) {
+                const filename = `ETL_Log_${date}.txt`;
+                Toast.show(`Auto-downloading ${filename}...`, 'success');
+            },
+            downloadResult() {
+                const filename = `Vista_Result_${STATE.selectedDate}.xlsx`;
+                Toast.show(`Downloading Result: ${filename}`, 'success');
+            },
+            downloadTickets() {
+                const filename = `Vista_CleanedTT_${STATE.selectedDate}.xlsx`;
+                Toast.show(`Downloading Tickets: ${filename}`, 'success');
+            }
+        };
+
+        const Modals = {
+            createModal(title, body, footer = '') {
+                const container = document.getElementById('modal-container');
+                if (!container) return;
+                
+                container.innerHTML = `
+                    <div class="modal-overlay" id="modal-overlay">
+                        <div class="modal">
+                            <div class="modal-header">
+                                <h3>${title}</h3>
+                                <span class="close-modal">&times;</span>
+                            </div>
+                            <div class="modal-body">${body}</div>
+                            ${footer ? `<div class="modal-footer">${footer}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+                
+                const overlay = container.querySelector('.modal-overlay');
+                const closeBtn = container.querySelector('.close-modal');
+                if (overlay) {
+                    overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
+                }
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => { overlay.remove(); });
+                }
+            },
+
+            addCustomRow() {
+                const data = MOCK_DB.processedData[STATE.selectedDate];
+                if (!data) {
+                    Toast.show('No data available for this date.', 'error');
+                    return;
+                }
+
+                const cats = data.availableCategories || [];
+                const checkboxes = cats.map(c => `
+                    <label class="checkbox-label" style="display:inline-flex; align-items:center; margin-right:15px;">
+                        <input type="checkbox" value="${c}" class="custom-cat-check"> ${c}
+                    </label>
+                `).join('');
+
+                this.createModal('Add Custom Exclusion Row',
+                    `<div class="form-group">
+                        <label class="form-label">Row Name</label>
+                        <input id="custom-row-name" class="form-input" placeholder="e.g. Power + NOA">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Select Categories to Combine</label>
+                        <div>${checkboxes}</div>
+                    </div>`,
+                    `<button class="btn btn-primary" id="add-custom-btn">Add Row</button>`
+                );
+
+                document.getElementById('add-custom-btn').onclick = () => {
+                    const name = document.getElementById('custom-row-name').value;
+                    const selectedCats = Array.from(document.querySelectorAll('.custom-cat-check:checked')).map(cb => cb.value);
+                    
+                    if (!name || selectedCats.length === 0) {
+                        Toast.show('Please enter a name and select at least one category.', 'error');
+                        return;
+                    }
+
+                    const vals = {};
+                    ['2G', '3G', '4G', 'TDD', '5G'].forEach(tech => {
+                        const combinedOutage = selectedCats.reduce((sum, cat) => {
+                            const chartItem = data.charts[tech].find(i => i.label === cat);
+                            return sum + (chartItem ? chartItem.baseOutage : 0);
+                        }, 0);
+                        
+                        const total = data.totalOutagePerTech[tech];
+                        const tcha = data.tcha[tech];
+                        const exclusion = tcha + (combinedOutage * (100 - tcha) / total);
+                        vals[tech] = exclusion.toFixed(2);
+                    });
+
+                    data.customRows.push({ category: name, vals });
+                    document.getElementById('modal-overlay').remove();
+                    Views.UserResults(document.getElementById('results-content'));
+                    Toast.show('Custom row added.', 'success');
+                };
+            },
+
+            forgotPassword() {
+                this.createModal('Forgot Password', 
+                    `<p>Please communicate with Admin to reset your password.</p>
+                     <p class="mt-4"><strong>Admin Contact:</strong> admin@iranvs.ir</p>`,
+                    `<button class="btn btn-primary" onclick="document.getElementById('modal-overlay')?.remove()">Close</button>`
+                );
+            },
+
+            forcePasswordChange(user) {
+                this.createModal('Change Password', 
+                    `<p>Welcome, ${user.name}. You must change your password on first login.</p>
+                     <input type="password" id="new-pw" class="form-input mt-4" placeholder="New Password">`,
+                    `<button class="btn btn-primary" id="confirm-pw-change">Update</button>`
+                );
+                
+                document.getElementById('confirm-pw-change').onclick = () => {
+                    const newPw = document.getElementById('new-pw');
+                    if(newPw && newPw.value) {
+                        user.password = newPw.value;
+                        user.forcePwChange = false;
+                        document.getElementById('modal-overlay')?.remove();
+                        Auth.completeLogin(user);
+                    }
+                };
+            },
+
+            createUser() {
+                this.createModal('Create User', 
+                    `<div class="form-group"><label>Email (@iranvs.ir)</label><input id="new-email" class="form-input" type="email" placeholder="name@iranvs.ir"></div>`,
+                    `<button class="btn btn-primary" id="add-user-btn">Create</button>`
+                );
+                
+                document.getElementById('add-user-btn').onclick = () => {
+                    const email = document.getElementById('new-email');
+                    if(email && email.value) {
+                        MOCK_DB.users.push({
+                            id: Date.now(),
+                            name: email.value.split('@')[0],
+                            email: email.value,
+                            password: '1qaz!QAZ',
+                            role: 'user',
+                            status: 'active',
+                            forcePwChange: true
+                        });
+                        document.getElementById('modal-overlay')?.remove();
+                        App.loadView('user-mgmt');
+                        Toast.show('User created with default password.', 'success');
+                    }
+                };
+            },
+
+            resetPw(id) {
+                const user = MOCK_DB.users.find(u => u.id === id);
+                if (user) {
+                    user.password = '1qaz!QAZ';
+                    user.forcePwChange = true;
+                    Toast.show('Password reset to default.', 'success');
+                }
+            },
+
+            uploadSubRoot() {
+                this.createModal('Upload SubRootcuz.xlsx', 
+                    `<p>This file is used for ETL lookup process.</p>
+                     <input type="file" class="form-input mt-4">`,
+                    `<button class="btn btn-primary" id="subroot-upload-btn">Save</button>`
+                );
+                
+                document.getElementById('subroot-upload-btn').onclick = () => {
+                    document.getElementById('modal-overlay')?.remove();
+                    Toast.show('SubRootcuz file updated.', 'success');
+                };
+            },
+
+            devInfo() {
+                this.createModal('Developer Info', 
+                    `<div style="text-align: left; font-size: 13px;">
+                        <p><strong>Docker & Postgres Info:</strong></p>
+                        <pre>
+version: '3'
+services:
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: vista_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: secret
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db</pre>
+                    </div>`,
+                    `<button class="btn btn-primary" onclick="document.getElementById('modal-overlay')?.remove()">Close</button>`
+                );
+            }
+        };
+
+        /* --- TOAST --- */
+        const Toast = {
+            show(msg, type = 'success') {
+                const container = document.getElementById('toast-container');
+                if (!container) return;
+                
+                const el = document.createElement('div');
+                el.className = `toast ${type}`;
+                el.innerHTML = `<span>${type === 'success' ? '✔' : '✖'}</span> ${msg}`;
+                container.appendChild(el);
+                setTimeout(() => {
+                    if (el.parentNode === container) {
+                        container.removeChild(el);
+                    }
+                }, 3000);
+            }
+        };
+
+        window.Actions = Actions;
+        window.Modals = Modals;
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => App.init());
+        } else {
+            App.init();
+        }
+    </script>
+</body>
+</html>
