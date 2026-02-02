@@ -2,7 +2,7 @@
 
 ## 📋 Project Overview
 
-**Vista Service Daily TCHA Exclusion** is a web-based dashboard application designed for telecommunications network performance monitoring and management. The system enables NPM teams to analyze and exclude TCHA (Total Cell Hours of Availability) outages across different network technologies (2G, 3G, 4G, TDD, 5G) while categorizing incidents by root causes.
+**Vista Service Daily TCHA Exclusion** is a web-based dashboard application designed for telecommunications network performance monitoring and management. The system enables users to analyze and exclude TCHA outages across different network technologies (2G, 3G, 4G, TDD, 5G) while categorizing incidents by root causes.
 
 ### **Core Purpose**
 Transform raw incident ticket data into actionable insights by calculating TCHA exclusions based on outage categories, enabling accurate network availability reporting.
@@ -26,10 +26,10 @@ Transform raw incident ticket data into actionable insights by calculating TCHA 
 
 ### **3. Data Upload & ETL Processing**
 - **Excel file upload** for incident ticket data
-- **Technology-specific TCHA target input** (2G, 3G, 4G, TDD, 5G)
-- **Simulated ETL pipeline** with real-time logging
-- **SubRootcuz.xlsx lookup file** integration
-- **Automated outage calculation** based on TCHA targets
+- **Technology-specific TCHA input** (2G, 3G, 4G, TDD, 5G) availability input in number only format with two decimals
+- **Simulated ETL pipeline** with real-time logging and auto download log file when completed, logs are very comprehensive
+- **SubRootcuz.xlsx lookup file** integration, no need to upload at each attempt. irf not uploaded use the previous one then
+- **Automated outage calculation** based on input of TCHA
 
 ### **4. Results Visualization**
 - **Technology-wise outage summary tables**
@@ -37,12 +37,13 @@ Transform raw incident ticket data into actionable insights by calculating TCHA 
 - **Custom row creation** for combined category analysis
 - **Date-based data filtering**
 - **Responsive grid layout** for multi-technology comparison
+- **Interactive line charts** for showing availability per technology for the time window of slected date and its past 10 days.
 
 ### **5. Data Analysis Features**
 - **Categorized outage analysis** (Power, NOA, Non Telecom, PA/UA, Spare, Third Party, Others)
 - **Technology-specific algorithms** for outage distribution
 - **Custom exclusion rows** for combined category analysis
-- **Export capabilities** for results and cleaned ticket data
+- **Export capabilities** for charts and table results and cleaned ticket data which calculation is based on
 
 ---
 
@@ -136,7 +137,7 @@ MOCK_DB = {
 ```
 1. Admin Uploads Data
    ↓
-2. User Inputs TCHA Targets per Technology
+2. Admin Uploads TCHA per Technology
    ↓
 3. ETL Process Simulates Data Processing
    ↓
