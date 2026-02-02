@@ -802,6 +802,14 @@
                     return;
                 }
 
+                // Calculate totals for each technology
+                const techTotals = {};
+                ['2G', '3G', '4G', 'TDD', '5G'].forEach(tech => {
+                    if (data.techData && data.techData[tech]) {
+                        techTotals[tech] = Math.round(data.techData[tech].totalOutage);
+                    }
+                });
+
                 // Render Table
                 const baseRows = data.rows.map(row => this.renderRow(row, false)).join('');
                 const customRows = (data.customRows || []).map(row => this.renderRow(row, true)).join('');
@@ -814,21 +822,21 @@
                             <thead>
                                 <tr>
                                     <th>Category / TCHA</th>
-                                    <th>2G Excluded</th>
-                                    <th>3G Excluded</th>
-                                    <th>4G Excluded</th>
-                                    <th>TDD Excluded</th>
-                                    <th>5G Excluded</th>
+                                    <th>2G<br/><small>Total: ${techTotals['2G'] || 0} min</small></th>
+                                    <th>3G<br/><small>Total: ${techTotals['3G'] || 0} min</small></th>
+                                    <th>4G<br/><small>Total: ${techTotals['4G'] || 0} min</small></th>
+                                    <th>TDD<br/><small>Total: ${techTotals['TDD'] || 0} min</small></th>
+                                    <th>5G<br/><small>Total: ${techTotals['5G'] || 0} min</small></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
                                     <td><strong>TCHA (Base)</strong></td>
-                                    <td>${data.tcha['2G']}</td>
-                                    <td>${data.tcha['3G']}</td>
-                                    <td>${data.tcha['4G']}</td>
-                                    <td>${data.tcha['TDD']}</td>
-                                    <td>${data.tcha['5G']}</td>
+                                    <td>${data.tcha['2G']}%</td>
+                                    <td>${data.tcha['3G']}%</td>
+                                    <td>${data.tcha['4G']}%</td>
+                                    <td>${data.tcha['TDD']}%</td>
+                                    <td>${data.tcha['5G']}%</td>
                                 </tr>
                                 ${baseRows}
                                 ${customRows}
@@ -841,7 +849,9 @@
                 // Render Highcharts
                 let chartsHTML = `<div class="charts-container">`;
                 ['2G', '3G', '4G', 'TDD', '5G'].forEach(tech => {
-                    chartsHTML += ChartsService.generateDonutCard(tech, data.charts[tech]);
+                    if (data.charts && data.charts[tech]) {
+                        chartsHTML += ChartsService.generateDonutCard(tech, data.charts[tech]);
+                    }
                 });
                 chartsHTML += `</div>`;
 
@@ -850,7 +860,9 @@
                 // Initialize charts after DOM insertion
                 setTimeout(() => {
                     ['2G', '3G', '4G', 'TDD', '5G'].forEach(tech => {
-                        ChartsService.renderChart(`chart-${tech}`, tech, data.charts[tech]);
+                        if (data.charts && data.charts[tech]) {
+                            ChartsService.renderChart(`chart-${tech}`, tech, data.charts[tech]);
+                        }
                     });
                 }, 100);
             },
@@ -912,82 +924,99 @@
             },
 
             generateMockData(date, tchaValues) {
-                const KNOWN_CATEGORIES = ['power', 'NOA', 'Non Telecom', 'PA / UA', 'Spare', 'Third Party'];
+                const KNOWN_CATEGORIES = ['Power', 'NOA', 'Non Telecom', 'PA / UA', 'Spare', 'Third Party'];
                 const FINAL_CATEGORIES = [...KNOWN_CATEGORIES, 'Others'];
                 const techs = ['2G', '3G', '4G', 'TDD', '5G'];
 
-                // Simulate Raw Data
-                const rawOutageData = [];
-                for(let i=0; i<50; i++) {
-                    const tech = techs[i % techs.length];
-                    let cat;
-                    if (Math.random() > 0.2) {
-                        cat = KNOWN_CATEGORIES[i % KNOWN_CATEGORIES.length];
-                    } else {
-                        cat = `Unknown Cause ${Math.floor(Math.random()*10)}`;
-                    }
-                    const outage = Math.floor(Math.random() * 800) + 100;
-                    rawOutageData.push({ tech, cat, outage });
-                }
-
-                const aggregatedData = {};
-                FINAL_CATEGORIES.forEach(c => {
-                    aggregatedData[c] = { totalOutage: 0, count: 0 };
-                });
-
-                rawOutageData.forEach(d => {
-                    let bucketKey = KNOWN_CATEGORIES.includes(d.cat) ? d.cat : 'Others';
-                    aggregatedData[bucketKey].totalOutage += d.outage;
-                    aggregatedData[bucketKey].count += 1;
-                });
-
-                const totalOutagePerTech = {};
-                techs.forEach(t => {
-                    let sum = 0;
-                    FINAL_CATEGORIES.forEach(c => {
-                        sum += aggregatedData[c].totalOutage; 
-                    });
-                    totalOutagePerTech[t] = sum / techs.length;
-                });
-
-                const rows = FINAL_CATEGORIES.map(cat => {
-                    const vals = {};
-                    techs.forEach(tech => {
-                        const outage = aggregatedData[cat].totalOutage / techs.length;
-                        const total = totalOutagePerTech[tech];
-                        const tcha = tchaValues[tech] || 0;
-                        const exclusion = tcha + (outage * (100 - tcha) / total);
-                        vals[tech] = exclusion.toFixed(2);
-                    });
-                    return { 
-                        category: cat, 
-                        vals,
-                        baseOutage: aggregatedData[cat].totalOutage / techs.length
-                    };
-                });
-
-                const chartData = {};
+                // Generate DIFFERENT data for each technology based on TCHA
+                const techData = {};
+                
                 techs.forEach(tech => {
-                    chartData[tech] = FINAL_CATEGORIES.map(cat => {
-                        const outage = aggregatedData[cat].totalOutage / techs.length;
-                        const total = totalOutagePerTech[tech];
-                        const percentage = (outage / total) * 100;
+                    const baseTCHA = tchaValues[tech] || 98.0;
+                    const outageDistribution = {};
+                    let totalOutage = 0;
+                    
+                    // Generate unique distribution for each technology
+                    FINAL_CATEGORIES.forEach(cat => {
+                        // Base outage influenced by TCHA (lower TCHA = more outages)
+                        let baseOutage = Math.random() * 1000 + 200;
+                        
+                        // Adjust based on technology characteristics
+                        if (tech === '2G') {
+                            // 2G typically has more power-related outages
+                            if (cat === 'Power') baseOutage *= 1.5;
+                            if (cat === 'Spare') baseOutage *= 1.3;
+                        } else if (tech === '3G') {
+                            // 3G has more NOA issues
+                            if (cat === 'NOA') baseOutage *= 1.8;
+                        } else if (tech === '4G') {
+                            // 4G has more PA/UA and Third Party issues
+                            if (cat === 'PA / UA') baseOutage *= 1.6;
+                            if (cat === 'Third Party') baseOutage *= 1.4;
+                        } else if (tech === 'TDD') {
+                            // TDD typically has more site access issues
+                            if (cat === 'Non Telecom') baseOutage *= 1.7;
+                        } else if (tech === '5G') {
+                            // 5G has more spare parts issues
+                            if (cat === 'Spare') baseOutage *= 2.0;
+                        }
+                        
+                        // Add random variation
+                        baseOutage *= (0.8 + Math.random() * 0.4);
+                        
+                        outageDistribution[cat] = Math.round(baseOutage);
+                        totalOutage += baseOutage;
+                    });
+
+                    // Normalize to create percentages
+                    const chartData = FINAL_CATEGORIES.map(cat => {
+                        const outage = outageDistribution[cat];
+                        const percentage = (outage / totalOutage) * 100;
                         return {
                             label: cat,
                             value: percentage,
                             baseOutage: outage
                         };
                     });
+
+                    techData[tech] = {
+                        totalOutage: totalOutage,
+                        chartData: chartData,
+                        outageDistribution: outageDistribution
+                    };
+                });
+
+                // Generate rows for table
+                const rows = FINAL_CATEGORIES.map(cat => {
+                    const vals = {};
+                    techs.forEach(tech => {
+                        const data = techData[tech];
+                        const outage = data.outageDistribution[cat];
+                        const total = data.totalOutage;
+                        const tcha = tchaValues[tech] || 0;
+                        // Calculate exclusion based on outage contribution
+                        const exclusion = tcha + (outage * (100 - tcha) / total);
+                        vals[tech] = exclusion.toFixed(2);
+                    });
+                    return { 
+                        category: cat, 
+                        vals
+                    };
                 });
 
                 MOCK_DB.processedData[date] = {
                     tcha: tchaValues,
                     rows,
                     availableCategories: FINAL_CATEGORIES,
-                    totalOutagePerTech,
+                    techData: techData,
                     customRows: [],
-                    charts: chartData
+                    charts: {}
                 };
+
+                // Generate chart data for each technology
+                techs.forEach(tech => {
+                    MOCK_DB.processedData[date].charts[tech] = techData[tech].chartData;
+                });
 
                 Logger.log(STATE.currentUser.id, 'Upload Data', 'Success');
             }
@@ -996,7 +1025,7 @@
         /* --- CHART SERVICE (HIGHCHARTS) --- */
         const ChartsService = {
             // Vista Color Palette
-            VISTA_COLORS: ['#2549A0', '#78DD12', '#2549A0', '#F59E0B', '#9C27B0', '#00BCD4', '#888888'],
+            VISTA_COLORS: ['#2549A0', '#78DD12', '#F59E0B', '#9C27B0', '#00BCD4', '#888888', '#FF6B6B'],
 
             generateDonutCard(tech, data) {
                 const chartId = `chart-${tech}`;
@@ -1005,6 +1034,9 @@
                     <div class="chart-card">
                         <div class="chart-title">${tech} Outage Distribution</div>
                         <div id="${chartId}" style="width: 100%; height: 400px;"></div>
+                        <div style="margin-top: 10px; font-size: 12px; color: var(--color-text-light); text-align: center;">
+                            Total Outages: ${data.reduce((sum, item) => sum + item.baseOutage, 0).toLocaleString()} minutes
+                        </div>
                     </div>
                 `;
             },
@@ -1013,58 +1045,94 @@
                 const container = document.getElementById(containerId);
                 if (!container) return;
                 
-                // Map data to Highcharts format
-                const seriesData = data.map((d, i) => {
+                // Sort data by value for better visualization
+                const sortedData = [...data].sort((a, b) => b.value - a.value);
+                
+                const seriesData = sortedData.map((d, i) => {
                     let color = this.VISTA_COLORS[i % this.VISTA_COLORS.length];
-                    if (d.label === 'Others') color = '#888888';
+                    
+                    // Consistent colors for categories across charts
+                    const categoryColors = {
+                        'Power': '#2549A0',
+                        'NOA': '#78DD12',
+                        'Non Telecom': '#F59E0B',
+                        'PA / UA': '#9C27B0',
+                        'Spare': '#00BCD4',
+                        'Third Party': '#FF6B6B',
+                        'Others': '#888888'
+                    };
+                    
+                    color = categoryColors[d.label] || color;
+                    
                     return {
                         name: d.label,
                         y: parseFloat(d.value.toFixed(2)),
-                        color: color
+                        color: color,
+                        baseOutage: d.baseOutage
                     };
                 });
+
+                // Technology-specific color
+                const techColors = {
+                    '2G': '#2549A0',
+                    '3G': '#78DD12',
+                    '4G': '#F59E0B',
+                    'TDD': '#9C27B0',
+                    '5G': '#00BCD4'
+                };
 
                 Highcharts.chart(containerId, {
                     chart: {
                         type: 'pie',
-                        backgroundColor: null // Transparent background for card
+                        backgroundColor: 'transparent'
                     },
                     title: {
-                        text: null
+                        text: `${tech} - Outage Analysis`,
+                        align: 'center',
+                        style: { fontSize: '14px', fontWeight: 'bold', color: techColors[tech] || '#333' }
+                    },
+                    subtitle: {
+                        text: `Based on uploaded TCHA: ${MOCK_DB.processedData[STATE.selectedDate]?.tcha[tech] || 'N/A'}%`,
+                        align: 'center',
+                        style: { fontSize: '11px' }
                     },
                     tooltip: {
-                        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                        pointFormat: '<b>{point.name}</b>: {point.y:.1f}%<br/>Outage: {point.baseOutage:.0f} min'
                     },
                     plotOptions: {
                         pie: {
                             allowPointSelect: true,
                             cursor: 'pointer',
-                            innerSize: '60%', // Donut hole size
-                            dataLabels: [{
+                            innerSize: '40%',
+                            dataLabels: {
                                 enabled: true,
-                                format: '{point.percentage:.1f} %',
-                                distance: -30,
+                                format: '<b>{point.name}</b>: {point.percentage:.1f}%',
+                                distance: 20,
                                 style: {
-                                    color: 'white',
-                                    fontWeight: 'bold',
-                                    textOutline: 'none',
-                                    opacity: 1,
-                                    fontSize: '14px'
+                                    fontWeight: 'normal',
+                                    fontSize: '11px'
                                 },
                                 filter: {
-                                    operator: '>',
                                     property: 'percentage',
-                                    value: 10
+                                    operator: '>',
+                                    value: 5
                                 }
-                            }]
+                            },
+                            showInLegend: true
                         }
+                    },
+                    legend: {
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'middle',
+                        itemStyle: { fontSize: '10px' }
                     },
                     credits: {
                         enabled: false
                     },
                     series: [{
-                        name: 'Outage',
-                        colorByPoint: false, // We use explicit colors
+                        name: 'Outage %',
+                        colorByPoint: true,
                         data: seriesData
                     }]
                 });
@@ -1209,7 +1277,7 @@
                             return sum + (chartItem ? chartItem.baseOutage : 0);
                         }, 0);
                         
-                        const total = data.totalOutagePerTech[tech];
+                        const total = data.techData[tech].totalOutage;
                         const tcha = data.tcha[tech];
                         const exclusion = tcha + (combinedOutage * (100 - tcha) / total);
                         vals[tech] = exclusion.toFixed(2);
