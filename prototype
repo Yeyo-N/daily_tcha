@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vista Service Daily TCHA Exclusion</title>
-    <!-- Highcharts Library -->
     <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
     <style>
-        /* --- CSS VARIABLES & RESET --- */
         :root {
             --color-blue: #2549A0;
             --color-blue-light: #eef2ff;
@@ -38,7 +38,6 @@
             overflow: hidden;
         }
 
-        /* --- UTILITY CLASSES --- */
         .hidden { display: none !important; }
         .flex { display: flex; }
         .flex-col { flex-direction: column; }
@@ -54,7 +53,6 @@
         .mb-4 { margin-bottom: 1rem; }
         .p-4 { padding: 1rem; }
         
-        /* --- BUTTONS --- */
         .btn {
             padding: 10px 20px;
             border: none;
@@ -77,7 +75,6 @@
         .btn-danger { background-color: var(--color-danger); color: white; }
         .btn-sm { padding: 6px 12px; font-size: 12px; }
 
-        /* --- FORMS --- */
         .form-group { margin-bottom: 1rem; text-align: left; }
         .form-label { display: block; margin-bottom: 0.5rem; font-weight: 500; font-size: 14px; color: var(--color-text-light); }
         .form-input, .form-select {
@@ -90,7 +87,6 @@
         }
         .form-input:focus { border-color: var(--color-blue); }
         
-        /* Grid for Inputs */
         .input-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -99,7 +95,6 @@
         .input-item { display: flex; flex-direction: column; }
         .input-item label { font-size: 12px; margin-bottom: 4px; color: var(--color-text-light); }
 
-        /* --- LAYOUTS --- */
         .login-view {
             height: 100vh;
             display: flex;
@@ -117,7 +112,6 @@
             animation: slideUp 0.5s ease-out;
         }
 
-        /* --- NEW TOP NAVIGATION (PROFESSIONAL) --- */
         .app-container { 
             display: flex; 
             flex-direction: column; 
@@ -125,7 +119,7 @@
             width: 100vw; 
         }
         .top-nav {
-            height: 80px; /* Increased height for space */
+            height: 80px; 
             background: var(--color-white);
             box-shadow: 0 1px 0 rgba(0,0,0,0.03);
             display: flex;
@@ -148,16 +142,17 @@
             gap: 1px; 
             flex: 1;
             justify-content: center;
+            align-items: stretch;
         }
         
         .nav-box {
-            padding: 0 35px; /* Increased horizontal space */
+            padding: 0 35px; 
             background-color: white;
             border: 1px solid transparent; 
             border-radius: 0;
             color: var(--color-text-light);
-            font-weight: 700; /* Bolder */
-            font-size: 15px; /* Slightly larger text */
+            font-weight: 700; 
+            font-size: 15px; 
             cursor: pointer;
             transition: all 0.2s ease;
             display: flex;
@@ -165,18 +160,29 @@
             height: 100%;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            position: relative;
         }
         
         .nav-separator {
             width: 1px;
-            height: 30px; /* Taller line */
+            height: 30px; 
             background-color: var(--color-gray-border);
+            align-self: center;
         }
         
         .nav-box:hover, .nav-box.active {
             background-color: var(--color-blue-light);
             color: var(--color-blue);
-            border-bottom: 3px solid var(--color-blue); /* Thicker highlight */
+        }
+        
+        .nav-box.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--color-blue);
         }
 
         .nav-profile {
@@ -188,9 +194,7 @@
             min-width: 200px;
             justify-content: flex-end;
         }
-        .nav-profile-info {
-            text-align: right;
-        }
+        .nav-profile-info { text-align: right; }
         .nav-name { font-weight: 600; font-size: 14px; color: var(--color-text); }
         .nav-role { font-size: 11px; color: var(--color-text-light); text-transform: uppercase; }
         
@@ -206,16 +210,16 @@
             padding: 2rem;
             overflow-y: auto;
         }
-        /* Page Title inside content area now */
         .page-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         .page-title { font-size: 1.5rem; font-weight: 700; color: var(--color-blue); }
 
-        /* Cards & Stats */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -228,13 +232,15 @@
             border-radius: var(--radius);
             box-shadow: var(--shadow-card);
             border-left: 4px solid var(--color-blue);
-            transition: transform 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-        .stat-card:hover { transform: translateY(-3px); }
+        .stat-card:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
         .stat-value { font-size: 2rem; font-weight: 700; color: var(--color-text); margin: 0.5rem 0; }
         .stat-label { font-size: 0.9rem; color: var(--color-text-light); }
 
-        /* Tables */
         .table-container {
             background: var(--color-white);
             border-radius: var(--radius);
@@ -244,7 +250,7 @@
         }
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--color-gray-border); font-size: 14px; }
-        th { background-color: #f8f9fa; font-weight: 600; color: var(--color-text-light); }
+        th { background-color: #f8f9fa; font-weight: 600; color: var(--color-text-light); white-space: nowrap;}
         tr:last-child td { border-bottom: none; }
         .status-badge {
             padding: 4px 8px;
@@ -255,10 +261,9 @@
         .status-active { background-color: #e6fffa; color: #2c7a7b; }
         .status-inactive { background-color: #fff5f5; color: #c53030; }
 
-        /* --- CHARTS AREA (SPACIOUS) --- */
         .charts-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); /* Wider columns */
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
             gap: 2rem;
             margin-top: 2rem;
         }
@@ -267,27 +272,38 @@
             padding: 1.5rem;
             border-radius: var(--radius);
             box-shadow: var(--shadow-card);
-            /* Increased height to fit charts properly */
-            min-height: 550px; 
-            max-height: 650px;
+            min-height: 450px; 
             display: flex;
             flex-direction: column;
         }
-        .chart-title { font-weight: 600; margin-bottom: 1rem; color: var(--color-blue); font-size: 16px;}
-        
-        /* Highcharts Container */
-        .highcharts-figure {
-            margin: 0 auto;
-            width: 100%;
+        .chart-card.full-width {
+            grid-column: 1 / -1;
+            min-height: 400px;
         }
 
-        /* Modal */
+        .chart-title { font-weight: 600; margin-bottom: 1rem; color: var(--color-blue); font-size: 16px;}
+
+        /* Trend Charts Grid Layout */
+        .trend-charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        @media (max-width: 1200px) {
+            .trend-charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.5);
             display: flex; align-items: center; justify-content: center;
             z-index: 1000;
-            backdrop-filter: blur(2px);
+            backdrop-filter: blur(4px);
         }
         .modal {
             background: var(--color-white);
@@ -303,8 +319,8 @@
         .modal-body { padding: 1.5rem; }
         .modal-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--color-gray-border); display: flex; justify-content: flex-end; gap: 10px; }
         .close-modal { cursor: pointer; font-size: 24px; color: #999; }
+        .close-modal:hover { color: #333; }
 
-        /* Toast */
         .toast-container {
             position: fixed; bottom: 20px; right: 20px; z-index: 2000;
             display: flex; flex-direction: column; gap: 10px;
@@ -318,37 +334,66 @@
             display: flex; align-items: center; gap: 10px;
             animation: slideUp 0.3s ease-out;
             min-width: 300px;
+            border: 1px solid #eee;
         }
-        .toast.success { border-color: var(--color-green); }
-        .toast.error { border-color: var(--color-danger); }
+        .toast.success { border-left: 4px solid var(--color-green); }
+        .toast.error { border-left: 4px solid var(--color-danger); }
 
-        /* Animations */
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-
-        /* Code Block */
-        pre { background: #2d2d2d; color: #ccc; padding: 1rem; border-radius: 6px; overflow-x: auto; font-size: 12px; }
-        
-        #app {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
+        #etl-log-area {
+            background: #2d2d2d;
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 1rem;
+            border-radius: 6px;
+            font-size: 12px;
+            overflow-y: auto;
+            max-height: 300px;
+            white-space: pre-wrap;
         }
 
-        /* Custom Row Table Style */
         .custom-row td {
             background-color: #f0fdf4;
             font-style: italic;
         }
+        
+        .metric-cell {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .metric-minutes { font-weight: 600; color: var(--color-blue); }
+        .metric-sites { font-size: 12px; color: var(--color-text-light); }
+        
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        #app { flex: 1; display: flex; flex-direction: column; }
+        
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .checkbox-label:hover {
+            background: var(--color-gray-light);
+        }
+        .checkbox-label input {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
-    <!-- --- APP ROOT --- -->
     <div id="app"></div>
-
-    <!-- --- TOAST CONTAINER --- -->
     <div id="toast-container" class="toast-container"></div>
-
-    <!-- --- MODALS --- -->
     <div id="modal-container"></div>
 
     <script>
@@ -359,15 +404,17 @@
                 { id: 2, name: 'Test User', email: 'user@iranvs.ir', password: '1qaz!QAZ', role: 'user', status: 'active', forcePwChange: true }
             ],
             logs: [],
-            processedData: {} 
+            processedData: {},
+            subRootcuzFile: null,
+            cleanedTickets: {}
         };
 
-        // Generate some initial logs for dashboard
+        // Initialize Logs
         for(let i=0; i<50; i++) {
             MOCK_DB.logs.push({
                 id: Date.now() - i * 100000,
                 userId: i % 2 === 0 ? 1 : 2,
-                action: i % 3 === 0 ? 'Login' : 'Export',
+                action: i % 3 === 0 ? 'Login' : 'Data Export',
                 timestamp: new Date(Date.now() - i * 100000 * 5).toISOString(),
                 status: 'Success'
             });
@@ -388,17 +435,15 @@
                 clearTimeout(idleTimer);
                 idleTimer = setTimeout(() => {
                     Auth.logout();
-                    Toast.show('You were logged out due to inactivity.', 'error');
+                    Toast.show('Logged out due to inactivity.', 'error');
                 }, IDLE_TIMEOUT);
             }
         }
+        ['mousemove', 'keypress', 'click', 'scroll'].forEach(evt => {
+            document.addEventListener(evt, resetIdleTimer);
+        });
 
-        document.addEventListener('mousemove', resetIdleTimer);
-        document.addEventListener('keypress', resetIdleTimer);
-        document.addEventListener('click', resetIdleTimer);
-        document.addEventListener('scroll', resetIdleTimer);
-
-        /* --- CORE SYSTEM --- */
+        /* --- CORE APP CONTROLLER --- */
         const App = {
             init() {
                 this.render();
@@ -426,8 +471,8 @@
                                 <div style="width: 80px; height: 80px; margin: 0 auto 1rem; background: linear-gradient(135deg, var(--color-blue), var(--color-green)); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 24px;">
                                     VISTA
                                 </div>
-                                <h2 style="color: var(--color-blue); margin-top: 1rem;">Vista Service Daily TCHA Exclusion</h2>
-                                <p style="color: var(--color-text-light); font-size: 14px;">NPM Team Platform</p>
+                                <h2 style="color: var(--color-blue); margin-top: 1rem;">Vista Service Daily TCHA</h2>
+                                <p style="color: var(--color-text-light); font-size: 14px;">Network Performance Monitoring</p>
                             </div>
                             <form id="login-form">
                                 <div class="form-group">
@@ -488,10 +533,7 @@
             bindEvents() {
                 document.addEventListener('click', (e) => {
                     if (e.target.id === 'logout-btn') Auth.logout();
-                    if (e.target.id === 'forgot-pw-link') {
-                        e.preventDefault();
-                        Modals.forgotPassword();
-                    }
+                    if (e.target.id === 'forgot-pw-link') { e.preventDefault(); Modals.forgotPassword(); }
                 });
 
                 document.addEventListener('submit', (e) => {
@@ -499,9 +541,7 @@
                         e.preventDefault();
                         const email = document.getElementById('login-email');
                         const password = document.getElementById('login-password');
-                        if (email && password) {
-                            Auth.login(email.value, password.value);
-                        }
+                        if (email && password) Auth.login(email.value, password.value);
                     }
                 });
             },
@@ -513,19 +553,15 @@
                     
                     const topActions = document.getElementById('top-actions');
                     if (topActions && STATE.currentUser.role === 'admin') {
+                        topActions.innerHTML = `<button class="btn btn-sm btn-outline" onclick="Modals.devInfo()">Dev Info</button>`;
+                    } else {
                         topActions.innerHTML = '';
-                        const btn = document.createElement('button');
-                        btn.className = 'btn btn-sm btn-outline';
-                        btn.innerHTML = 'Dev Info';
-                        btn.onclick = () => Modals.devInfo();
-                        topActions.appendChild(btn);
                     }
                 }
             },
 
             loadView(viewId) {
                 STATE.currentView = viewId;
-                
                 const nav = document.getElementById('nav-links');
                 if(nav) {
                     nav.innerHTML = '';
@@ -559,22 +595,14 @@
                 content.innerHTML = '';
 
                 switch(viewId) {
-                    case 'admin-dash':
-                        title.textContent = 'Admin Dashboard';
-                        Views.AdminDash(content);
-                        break;
-                    case 'user-mgmt':
-                        title.textContent = 'User Management';
-                        Views.UserMgmt(content);
-                        break;
-                    case 'data-upload':
-                        title.textContent = 'Data Upload';
-                        Views.DataUpload(content);
-                        break;
-                    case 'user-results':
-                        title.textContent = 'Results Overview';
-                        Views.UserResults(content);
-                        break;
+                    case 'admin-dash': 
+                        title.textContent = 'Admin Dashboard'; Views.AdminDash(content); break;
+                    case 'user-mgmt': 
+                        title.textContent = 'User Management'; Views.UserMgmt(content); break;
+                    case 'data-upload': 
+                        title.textContent = 'Data Upload'; Views.DataUpload(content); break;
+                    case 'user-results': 
+                        title.textContent = 'Results Overview'; Views.UserResults(content); break;
                 }
             }
         };
@@ -582,6 +610,11 @@
         /* --- AUTH CONTROLLER --- */
         const Auth = {
             login(email, password) {
+                if (!email.endsWith('@iranvs.ir')) {
+                    Toast.show('Access restricted to @iranvs.ir domain', 'error');
+                    return;
+                }
+
                 const user = MOCK_DB.users.find(u => u.email === email && u.password === password);
                 if (user) {
                     if (user.status === 'inactive') {
@@ -597,7 +630,6 @@
                     Toast.show('Invalid credentials', 'error');
                 }
             },
-            
             completeLogin(user) {
                 STATE.currentUser = user;
                 STATE.currentView = 'dashboard';
@@ -606,11 +638,8 @@
                 resetIdleTimer();
                 App.render();
             },
-
             logout() {
-                if (STATE.currentUser) {
-                    Logger.log(STATE.currentUser.id, 'Logout', 'Success');
-                }
+                if (STATE.currentUser) Logger.log(STATE.currentUser.id, 'Logout', 'Success');
                 STATE.currentUser = null;
                 STATE.currentView = 'login';
                 clearTimeout(idleTimer);
@@ -631,7 +660,7 @@
             }
         };
 
-        /* --- UI VIEWS --- */
+        /* --- VIEWS RENDERER --- */
         const Views = {
             AdminDash(container) {
                 const today = new Date().toLocaleDateString();
@@ -642,12 +671,16 @@
                             <div class="stat-value">${MOCK_DB.users.length}</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-label">Today's Date</div>
-                            <div class="stat-value" style="font-size: 1.5rem">${today}</div>
+                            <div class="stat-label">System Date</div>
+                            <div class="stat-value" style="font-size: 1.2rem">${today}</div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-label">System Status</div>
-                            <div class="stat-value" style="color: var(--color-green); font-size: 1.5rem;">Operational</div>
+                            <div class="stat-value" style="color: var(--color-green); font-size: 1.2rem;">Operational</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">ETL Runs Today</div>
+                            <div class="stat-value">${Math.floor(Math.random() * 5) + 1}</div>
                         </div>
                     </div>
 
@@ -658,7 +691,7 @@
                                 <input type="date" id="log-start" class="form-input" style="width: auto;">
                                 <input type="date" id="log-end" class="form-input" style="width: auto;">
                                 <button class="btn btn-sm btn-secondary" onclick="Actions.filterLogs()">Filter</button>
-                                <button class="btn btn-sm btn-outline" onclick="Actions.exportLogs()">Export</button>
+                                <button class="btn btn-sm btn-outline" onclick="Actions.exportLogs()">Export CSV</button>
                             </div>
                         </div>
                         <div style="max-height: 400px; overflow-y: auto;">
@@ -669,7 +702,7 @@
                         </div>
                     </div>
                 `;
-                Actions.renderLogs(MOCK_DB.logs.slice(0, 100));
+                Actions.renderLogs(MOCK_DB.logs.slice(0, 50));
             },
 
             UserMgmt(container) {
@@ -681,7 +714,7 @@
                         <td>
                             <button class="btn btn-sm btn-outline" onclick="Modals.resetPw(${u.id})">Reset PW</button>
                             <button class="btn btn-sm btn-outline" onclick="Actions.toggleUserStatus(${u.id})">${u.status === 'active' ? 'Deactivate' : 'Activate'}</button>
-                            <button class="btn btn-sm btn-outline" onclick="Actions.exportUserLog(${u.id})">Export Logs</button>
+                            <button class="btn btn-sm btn-outline" onclick="Actions.exportUserLog(${u.id})">Logs</button>
                             ${u.role !== 'admin' ? `<button class="btn btn-sm btn-danger" onclick="Actions.deleteUser(${u.id})">Delete</button>` : ''}
                         </td>
                     </tr>
@@ -703,9 +736,20 @@
             },
 
             DataUpload(container) {
+                const subRootStatus = MOCK_DB.subRootcuzFile 
+                    ? `<span style="color: var(--color-green); font-weight: bold; font-size: 12px;">✔ ${MOCK_DB.subRootcuzFile.name} is active</span>` 
+                    : `<span style="color: var(--color-danger); font-weight: bold; font-size: 12px;">✖ No SubRootcuz file uploaded (System will use previous default)</span>`;
+
                 container.innerHTML = `
-                    <div class="stat-card" style="max-width: 800px; margin: 0 auto;">
+                    <div class="stat-card" style="max-width: 900px; margin: 0 auto;">
                         <h3 class="mb-4">Upload Incident Ticket Data</h3>
+                        
+                        <div class="p-4 mb-4" style="background: #f8f9fa; border-radius: var(--radius); border: 1px dashed #ccc;">
+                            <strong style="display:block; margin-bottom: 5px;">SubRootcuz.xlsx Lookup Status:</strong>
+                            ${subRootStatus}
+                            <button type="button" class="btn btn-sm btn-secondary mt-2" onclick="Modals.uploadSubRoot()">Upload SubRootcuz</button>
+                        </div>
+
                         <form id="upload-form">
                             <div class="form-group">
                                 <label class="form-label">Select Date</label>
@@ -713,31 +757,25 @@
                             </div>
                             
                             <div class="form-group">
-                                <label class="form-label">Enter Target TCHA (Availability %) per Technology</label>
+                                <label class="form-label">Target TCHA (Availability %)</label>
                                 <div class="input-grid">
-                                    <div class="input-item"><label>2G TCHA</label><input type="number" id="tcha-2g" step="0.01" class="form-input" placeholder="98.56" required></div>
-                                    <div class="input-item"><label>3G TCHA</label><input type="number" id="tcha-3g" step="0.01" class="form-input" placeholder="96.56" required></div>
-                                    <div class="input-item"><label>4G TCHA</label><input type="number" id="tcha-4g" step="0.01" class="form-input" placeholder="98.05" required></div>
-                                    <div class="input-item"><label>TDD TCHA</label><input type="number" id="tcha-tdd" step="0.01" class="form-input" placeholder="90.00" required></div>
-                                    <div class="input-item"><label>5G TCHA</label><input type="number" id="tcha-5g" step="0.01" class="form-input" placeholder="98.16" required></div>
+                                    <div class="input-item"><label>2G</label><input type="number" id="tcha-2g" step="0.01" class="form-input" placeholder="99.50" required></div>
+                                    <div class="input-item"><label>3G</label><input type="number" id="tcha-3g" step="0.01" class="form-input" placeholder="98.50" required></div>
+                                    <div class="input-item"><label>4G</label><input type="number" id="tcha-4g" step="0.01" class="form-input" placeholder="99.00" required></div>
+                                    <div class="input-item"><label>TDD</label><input type="number" id="tcha-tdd" step="0.01" class="form-input" placeholder="95.00" required></div>
+                                    <div class="input-item"><label>5G</label><input type="number" id="tcha-5g" step="0.01" class="form-input" placeholder="98.00" required></div>
                                 </div>
                             </div>
 
                             <div class="form-group">
-                                <label class="form-label">TT File (Excel)</label>
+                                <label class="form-label">Ticket File (Excel)</label>
                                 <input type="file" id="tt-file" class="form-input" accept=".xlsx, .xls" required>
                             </div>
-                            <div class="flex justify-between items-center">
-                                <button type="submit" class="btn btn-primary">Process ETL & Upload</button>
-                                <button type="button" class="btn btn-outline" onclick="Modals.uploadSubRoot()">Upload SubRootcuz.xlsx</button>
-                            </div>
+                            <button type="submit" class="btn btn-primary w-full">Process ETL Pipeline</button>
                         </form>
                     </div>
                     
-                    <div id="etl-log-area" class="mt-4 hidden">
-                        <h4>ETL Log:</h4>
-                        <pre style="height: 200px;"></pre>
-                    </div>
+                    <div id="etl-log-area" class="mt-4 hidden"></div>
                 `;
                 
                 setTimeout(() => {
@@ -772,6 +810,7 @@
                         <div class="flex gap-2" style="flex-wrap: wrap;">
                             <button class="btn btn-primary" onclick="Actions.downloadResult()">Download Result</button>
                             <button class="btn btn-outline" onclick="Actions.downloadTickets()">Download Tickets</button>
+                            <button class="btn btn-outline" onclick="Actions.exportCharts()">Export Charts</button>
                         </div>
                     </div>
                     
@@ -795,24 +834,18 @@
                 const data = MOCK_DB.processedData[STATE.selectedDate];
                 
                 if (!data) {
-                    container.innerHTML = `<div class="text-center p-4" style="background: white; border-radius: 8px;">
-                        <h3>No Data Available</h3>
-                        <p>Please select a different date or contact Admin to upload data for ${STATE.selectedDate}.</p>
+                    container.innerHTML = `<div class="text-center p-4" style="background: white; border-radius: 8px; padding: 3rem;">
+                        <h3 style="color: #888;">No Data Available</h3>
+                        <p>Please select a different date or contact Admin to upload data for <strong>${STATE.selectedDate}</strong>.</p>
                     </div>`;
                     return;
                 }
 
-                // Calculate totals for each technology
-                const techTotals = {};
-                ['2G', '3G', '4G', 'TDD', '5G'].forEach(tech => {
-                    if (data.techData && data.techData[tech]) {
-                        techTotals[tech] = Math.round(data.techData[tech].totalOutage);
-                    }
-                });
-
-                // Render Table
-                const baseRows = data.rows.map(row => this.renderRow(row, false)).join('');
-                const customRows = (data.customRows || []).map(row => this.renderRow(row, true)).join('');
+                const techs = ['2G', '3G', '4G', 'TDD', '5G'];
+                
+                // --- 1. Summary Table with Both Metrics ---
+                const baseRows = data.rows.map(row => this.renderRow(row, false, data)).join('');
+                const customRows = (data.customRows || []).map(row => this.renderRow(row, true, data)).join('');
 
                 const tableHTML = `
                     <div class="table-container mb-4">
@@ -821,22 +854,22 @@
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Category / TCHA</th>
-                                    <th>2G<br/><small>Total: ${techTotals['2G'] || 0} min</small></th>
-                                    <th>3G<br/><small>Total: ${techTotals['3G'] || 0} min</small></th>
-                                    <th>4G<br/><small>Total: ${techTotals['4G'] || 0} min</small></th>
-                                    <th>TDD<br/><small>Total: ${techTotals['TDD'] || 0} min</small></th>
-                                    <th>5G<br/><small>Total: ${techTotals['5G'] || 0} min</small></th>
+                                    <th>Category</th>
+                                    ${techs.map(t => `
+                                        <th style="text-align: center;">
+                                            <div>${t}</div>
+                                            <div style="font-size: 11px; font-weight: 400; color: #666;">
+                                                Out: ${data.techData[t]?.totalOutage || 0}m | 
+                                                Sites: ${data.techData[t]?.totalSites || 0}
+                                            </div>
+                                        </th>
+                                    `).join('')}
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td><strong>TCHA (Base)</strong></td>
-                                    <td>${data.tcha['2G']}%</td>
-                                    <td>${data.tcha['3G']}%</td>
-                                    <td>${data.tcha['4G']}%</td>
-                                    <td>${data.tcha['TDD']}%</td>
-                                    <td>${data.tcha['5G']}%</td>
+                                <tr style="background-color: #e6f3ff;">
+                                    <td><strong>TCHA (Base Target)</strong></td>
+                                    ${techs.map(t => `<td style="text-align: center; font-weight: 700;">${data.tcha[t]}%</td>`).join('')}
                                 </tr>
                                 ${baseRows}
                                 ${customRows}
@@ -846,196 +879,245 @@
                     </div>
                 `;
 
-                // Render Highcharts
+                // --- 2. Individual Trend Charts for Each Technology (Exclusion Values) ---
+                let trendChartsHTML = `<div class="trend-charts-grid">`;
+                techs.forEach(tech => {
+                    trendChartsHTML += `
+                        <div class="chart-card">
+                            <div class="chart-title">${tech} - Category Exclusion Trends (Last 10 Days)</div>
+                            <div id="trend-chart-${tech}" style="width: 100%; height: 350px;"></div>
+                        </div>
+                    `;
+                });
+                trendChartsHTML += `</div>`;
+
+                // --- 3. Donut Charts (Per Tech) ---
                 let chartsHTML = `<div class="charts-container">`;
-                ['2G', '3G', '4G', 'TDD', '5G'].forEach(tech => {
-                    if (data.charts && data.charts[tech]) {
-                        chartsHTML += ChartsService.generateDonutCard(tech, data.charts[tech]);
+                techs.forEach(tech => {
+                    if (data.techData && data.techData[tech]) {
+                        chartsHTML += ChartsService.generateDonutCard(tech, data.techData[tech]);
                     }
                 });
                 chartsHTML += `</div>`;
 
-                container.innerHTML = tableHTML + chartsHTML;
+                container.innerHTML = tableHTML + trendChartsHTML + chartsHTML;
                 
-                // Initialize charts after DOM insertion
+                // Initialize Charts after DOM insertion
                 setTimeout(() => {
-                    ['2G', '3G', '4G', 'TDD', '5G'].forEach(tech => {
-                        if (data.charts && data.charts[tech]) {
-                            ChartsService.renderChart(`chart-${tech}`, tech, data.charts[tech]);
+                    // Render individual tech trend charts showing exclusion values by category
+                    techs.forEach(tech => {
+                        ChartsService.renderTechTrendChart(`trend-chart-${tech}`, tech, STATE.selectedDate);
+                    });
+                    
+                    // Render Donuts
+                    techs.forEach(tech => {
+                        if (data.techData && data.techData[tech]) {
+                            ChartsService.renderChart(`chart-${tech}`, tech, data.techData[tech]);
                         }
                     });
                 }, 100);
             },
 
-            renderRow(row, isCustom) {
+            renderRow(row, isCustom, data) {
+                const techs = ['2G', '3G', '4G', 'TDD', '5G'];
                 return `
                     <tr class="${isCustom ? 'custom-row' : ''}">
-                        <td>${row.category} ${isCustom ? '(Custom)' : ''}</td>
-                        <td>${row.vals['2G']}</td>
-                        <td>${row.vals['3G']}</td>
-                        <td>${row.vals['4G']}</td>
-                        <td>${row.vals['TDD']}</td>
-                        <td>${row.vals['5G']}</td>
+                        <td style="font-weight: ${isCustom ? '600' : '400'};">
+                            ${row.category} 
+                            ${isCustom ? '<span style="font-size: 11px; color: #666; font-style: italic;">(Combined)</span>' : ''}
+                        </td>
+                        ${techs.map(t => {
+                            const mins = row.minutes?.[t] || row.vals?.[t] || 0;
+                            const sites = row.sites?.[t] || 0;
+                            const tcha = data.tcha[t];
+                            // Calculate exclusion value
+                            const totalOutage = data.techData[t]?.totalOutage || 1;
+                            const exclusion = parseFloat(tcha) + (parseFloat(mins) * (100 - parseFloat(tcha)) / totalOutage);
+                            
+                            return `
+                                <td style="text-align: center;">
+                                    <div class="metric-cell">
+                                        <div class="metric-minutes">${parseFloat(exclusion).toFixed(2)}%</div>
+                                        <div class="metric-sites">${mins} min (${sites} sites)</div>
+                                    </div>
+                                </td>
+                            `;
+                        }).join('')}
                     </tr>
                 `;
             }
         };
 
-        /* --- ETL LOGIC (SIMULATED) --- */
+        /* --- ETL LOGIC --- */
         const ETLService = {
             simulateProcess(date, tchaValues) {
-                const logArea = document.querySelector('#etl-log-area pre');
                 const container = document.getElementById('etl-log-area');
-                if (!logArea || !container) return;
+                if (!container) return;
                 
                 container.classList.remove('hidden');
-                logArea.textContent = 'Initializing ETL Process...\n';
+                let logContent = `ETL Log [${date}]\n`;
+                logContent += `================================\n`;
+                logContent += `Start Time: ${new Date().toLocaleString()}\n`;
+                logContent += `User: ${STATE.currentUser.email}\n`;
+                logContent += `Target TCHA: ${JSON.stringify(tchaValues)}\n\n`;
+                
+                container.innerHTML = logContent;
 
                 const steps = [
-                    'Reading TT file...',
-                    'Validating columns: Fault First Occur Time, Recovery Time...',
-                    `Parsing date boundaries for ${date}...`,
-                    'Calculating MTTR (Mean Time To Repair)...',
-                    'Merging with SubRootcuz.xlsx lookup...',
-                    'Filtering empty Site Province rows...',
-                    'Calculating Outages based on provided TCHA values...',
-                    'Generating Tracker File...',
-                    'Process Complete. Database updated.'
+                    { msg: 'Initializing ETL Pipeline...', delay: 200 },
+                    { msg: 'Reading TT file (Incident Tickets)...', delay: 800 },
+                    { msg: `Validating SubRootcuz.xlsx... ${MOCK_DB.subRootcuzFile ? 'Found: ' + MOCK_DB.subRootcuzFile.name : 'NOT FOUND - Using previous default mapping.'}`, delay: 1500 },
+                    { msg: `Parsing date boundaries for ${date} (00:00 - 23:59)...`, delay: 2200 },
+                    { msg: 'Filtering empty Site Province rows...', delay: 2800 },
+                    { msg: 'Categorizing Root Causes (Power, NOA, Non Telecom, PA/UA, Spare, Third Party, Others)...', delay: 3500 },
+                    { msg: 'Calculating Outage Durations per Technology (2G, 3G, 4G, TDD, 5G)...', delay: 4200 },
+                    { msg: 'Counting Affected Sites per Category per Technology...', delay: 4800 },
+                    { msg: 'Applying TCHA Availability Targets and Calculating Exclusions...', delay: 5500 },
+                    { msg: 'Generating Historical Trends (Last 10 Days)...', delay: 6200 },
+                    { msg: 'Cleaning and structuring ticket data...', delay: 6800 },
+                    { msg: 'Process Complete. Database updated successfully.', delay: 7200 }
                 ];
 
-                let i = 0;
-                const interval = setInterval(() => {
-                    if (i < steps.length) {
-                        logArea.textContent += `[${new Date().toLocaleTimeString()}] ${steps[i]}\n`;
-                        logArea.scrollTop = logArea.scrollHeight;
-                        i++;
+                let currentStep = 0;
+                
+                const processStep = () => {
+                    if (currentStep < steps.length) {
+                        logContent += `[${new Date().toLocaleTimeString()}] ${steps[currentStep].msg}\n`;
+                        container.textContent = logContent;
+                        container.scrollTop = container.scrollHeight;
+                        currentStep++;
+                        setTimeout(processStep, steps[currentStep-1].delay - (steps[currentStep-2]?.delay || 0));
                     } else {
-                        clearInterval(interval);
                         this.generateMockData(date, tchaValues);
-                        
-                        Actions.downloadETLLog(date);
-
+                        Actions.downloadETLLog(date, logContent);
                         Toast.show('ETL Process Successful! Log downloaded.', 'success');
                         setTimeout(() => {
                             container.classList.add('hidden');
-                        }, 2000);
+                        }, 3000);
                     }
-                }, 600);
+                };
+                
+                processStep();
             },
 
             generateMockData(date, tchaValues) {
-                const KNOWN_CATEGORIES = ['Power', 'NOA', 'Non Telecom', 'PA / UA', 'Spare', 'Third Party'];
-                const FINAL_CATEGORIES = [...KNOWN_CATEGORIES, 'Others'];
+                const CATEGORIES = ['Power', 'NOA', 'Non Telecom', 'PA / UA', 'Spare', 'Third Party', 'Others'];
                 const techs = ['2G', '3G', '4G', 'TDD', '5G'];
-
-                // Generate DIFFERENT data for each technology based on TCHA
                 const techData = {};
+                
+                // Generate cleaned ticket data
+                const cleanedTickets = [];
                 
                 techs.forEach(tech => {
                     const baseTCHA = tchaValues[tech] || 98.0;
                     const outageDistribution = {};
+                    const siteDistribution = {};
                     let totalOutage = 0;
+                    let totalSites = 0;
                     
-                    // Generate unique distribution for each technology
-                    FINAL_CATEGORIES.forEach(cat => {
-                        // Base outage influenced by TCHA (lower TCHA = more outages)
-                        let baseOutage = Math.random() * 1000 + 200;
+                    CATEGORIES.forEach(cat => {
+                        // Multipliers based on tech characteristics
+                        let multiplier = 1;
+                        let siteMultiplier = 1;
                         
-                        // Adjust based on technology characteristics
-                        if (tech === '2G') {
-                            // 2G typically has more power-related outages
-                            if (cat === 'Power') baseOutage *= 1.5;
-                            if (cat === 'Spare') baseOutage *= 1.3;
-                        } else if (tech === '3G') {
-                            // 3G has more NOA issues
-                            if (cat === 'NOA') baseOutage *= 1.8;
-                        } else if (tech === '4G') {
-                            // 4G has more PA/UA and Third Party issues
-                            if (cat === 'PA / UA') baseOutage *= 1.6;
-                            if (cat === 'Third Party') baseOutage *= 1.4;
-                        } else if (tech === 'TDD') {
-                            // TDD typically has more site access issues
-                            if (cat === 'Non Telecom') baseOutage *= 1.7;
-                        } else if (tech === '5G') {
-                            // 5G has more spare parts issues
-                            if (cat === 'Spare') baseOutage *= 2.0;
+                        if (tech === '2G' && cat === 'Power') { multiplier = 1.5; siteMultiplier = 1.2; }
+                        if (tech === '4G' && cat === 'Third Party') { multiplier = 1.4; siteMultiplier = 1.3; }
+                        if (tech === '5G' && cat === 'Spare') { multiplier = 2.0; siteMultiplier = 1.8; }
+                        if (cat === 'Power') { multiplier = 1.8; siteMultiplier = 2.0; }
+                        if (cat === 'NOA') { multiplier = 0.8; siteMultiplier = 0.6; }
+                        
+                        const outage = Math.round((Math.random() * 500 + 100) * multiplier);
+                        const sites = Math.round((Math.random() * 50 + 10) * siteMultiplier);
+                        
+                        outageDistribution[cat] = outage;
+                        siteDistribution[cat] = sites;
+                        totalOutage += outage;
+                        totalSites += sites;
+                        
+                        // Generate mock cleaned tickets for this category/tech
+                        for(let i=0; i<Math.min(sites, 5); i++) {
+                            cleanedTickets.push({
+                                ticketId: `TT${tech}${Date.now()}${i}`,
+                                technology: tech,
+                                category: cat,
+                                siteCode: `SITE${tech}${i}`,
+                                outageMinutes: Math.round(outage/sites),
+                                rootCause: cat,
+                                date: date
+                            });
                         }
-                        
-                        // Add random variation
-                        baseOutage *= (0.8 + Math.random() * 0.4);
-                        
-                        outageDistribution[cat] = Math.round(baseOutage);
-                        totalOutage += baseOutage;
                     });
 
-                    // Normalize to create percentages
-                    const chartData = FINAL_CATEGORIES.map(cat => {
+                    const chartData = CATEGORIES.map(cat => {
                         const outage = outageDistribution[cat];
                         const percentage = (outage / totalOutage) * 100;
-                        return {
-                            label: cat,
-                            value: percentage,
-                            baseOutage: outage
+                        return { 
+                            label: cat, 
+                            value: percentage, 
+                            baseOutage: outage,
+                            baseSites: siteDistribution[cat]
                         };
                     });
 
-                    techData[tech] = {
-                        totalOutage: totalOutage,
-                        chartData: chartData,
-                        outageDistribution: outageDistribution
+                    techData[tech] = { 
+                        totalOutage, 
+                        totalSites,
+                        chartData, 
+                        outageDistribution,
+                        siteDistribution
                     };
                 });
 
-                // Generate rows for table
-                const rows = FINAL_CATEGORIES.map(cat => {
-                    const vals = {};
+                // Generate Rows with both minutes and sites
+                const rows = CATEGORIES.map(cat => {
+                    const minutes = {};
+                    const sites = {};
                     techs.forEach(tech => {
-                        const data = techData[tech];
-                        const outage = data.outageDistribution[cat];
-                        const total = data.totalOutage;
-                        const tcha = tchaValues[tech] || 0;
-                        // Calculate exclusion based on outage contribution
-                        const exclusion = tcha + (outage * (100 - tcha) / total);
-                        vals[tech] = exclusion.toFixed(2);
+                        minutes[tech] = techData[tech].outageDistribution[cat];
+                        sites[tech] = techData[tech].siteDistribution[cat];
                     });
                     return { 
                         category: cat, 
-                        vals
+                        minutes,
+                        sites,
+                        vals: minutes // for backwards compatibility
                     };
                 });
 
                 MOCK_DB.processedData[date] = {
                     tcha: tchaValues,
                     rows,
-                    availableCategories: FINAL_CATEGORIES,
+                    availableCategories: CATEGORIES,
                     techData: techData,
-                    customRows: [],
-                    charts: {}
+                    customRows: []
                 };
+                
+                MOCK_DB.cleanedTickets[date] = cleanedTickets;
 
-                // Generate chart data for each technology
-                techs.forEach(tech => {
-                    MOCK_DB.processedData[date].charts[tech] = techData[tech].chartData;
-                });
-
-                Logger.log(STATE.currentUser.id, 'Upload Data', 'Success');
+                Logger.log(STATE.currentUser.id, 'ETL Process', 'Success');
             }
         };
 
-        /* --- CHART SERVICE (HIGHCHARTS) --- */
+        /* --- CHARTS SERVICE --- */
         const ChartsService = {
-            // Vista Color Palette
             VISTA_COLORS: ['#2549A0', '#78DD12', '#F59E0B', '#9C27B0', '#00BCD4', '#888888', '#FF6B6B'],
-
+            CATEGORY_COLORS: {
+                'Power': '#e74c3c',
+                'NOA': '#3498db',
+                'Non Telecom': '#2ecc71',
+                'PA / UA': '#f39c12',
+                'Spare': '#9b59b6',
+                'Third Party': '#1abc9c',
+                'Others': '#95a5a6'
+            },
+            
             generateDonutCard(tech, data) {
-                const chartId = `chart-${tech}`;
-                
                 return `
                     <div class="chart-card">
                         <div class="chart-title">${tech} Outage Distribution</div>
-                        <div id="${chartId}" style="width: 100%; height: 400px;"></div>
-                        <div style="margin-top: 10px; font-size: 12px; color: var(--color-text-light); text-align: center;">
-                            Total Outages: ${data.reduce((sum, item) => sum + item.baseOutage, 0).toLocaleString()} minutes
+                        <div id="chart-${tech}" style="width: 100%; height: 350px;"></div>
+                        <div style="margin-top: 10px; font-size: 12px; color: #666; text-align: center;">
+                            Total: ${data.totalOutage} minutes | ${data.totalSites} sites affected
                         </div>
                     </div>
                 `;
@@ -1044,97 +1126,166 @@
             renderChart(containerId, tech, data) {
                 const container = document.getElementById(containerId);
                 if (!container) return;
-                
-                // Sort data by value for better visualization
-                const sortedData = [...data].sort((a, b) => b.value - a.value);
-                
-                const seriesData = sortedData.map((d, i) => {
-                    let color = this.VISTA_COLORS[i % this.VISTA_COLORS.length];
-                    
-                    // Consistent colors for categories across charts
-                    const categoryColors = {
-                        'Power': '#2549A0',
-                        'NOA': '#78DD12',
-                        'Non Telecom': '#F59E0B',
-                        'PA / UA': '#9C27B0',
-                        'Spare': '#00BCD4',
-                        'Third Party': '#FF6B6B',
-                        'Others': '#888888'
-                    };
-                    
-                    color = categoryColors[d.label] || color;
-                    
-                    return {
-                        name: d.label,
-                        y: parseFloat(d.value.toFixed(2)),
-                        color: color,
-                        baseOutage: d.baseOutage
+
+                const seriesData = data.chartData.map((d, i) => {
+                    const color = this.VISTA_COLORS[i % this.VISTA_COLORS.length];
+                    return { 
+                        name: d.label, 
+                        y: parseFloat(d.value.toFixed(2)), 
+                        color: color, 
+                        baseOutage: d.baseOutage,
+                        baseSites: d.baseSites
                     };
                 });
 
-                // Technology-specific color
-                const techColors = {
-                    '2G': '#2549A0',
-                    '3G': '#78DD12',
-                    '4G': '#F59E0B',
-                    'TDD': '#9C27B0',
-                    '5G': '#00BCD4'
-                };
-
                 Highcharts.chart(containerId, {
-                    chart: {
-                        type: 'pie',
-                        backgroundColor: 'transparent'
-                    },
-                    title: {
-                        text: `${tech} - Outage Analysis`,
-                        align: 'center',
-                        style: { fontSize: '14px', fontWeight: 'bold', color: techColors[tech] || '#333' }
-                    },
-                    subtitle: {
-                        text: `Based on uploaded TCHA: ${MOCK_DB.processedData[STATE.selectedDate]?.tcha[tech] || 'N/A'}%`,
-                        align: 'center',
-                        style: { fontSize: '11px' }
-                    },
-                    tooltip: {
-                        pointFormat: '<b>{point.name}</b>: {point.y:.1f}%<br/>Outage: {point.baseOutage:.0f} min'
+                    chart: { type: 'pie', backgroundColor: 'transparent', height: 350 },
+                    title: { text: null },
+                    tooltip: { 
+                        pointFormat: '<b>{point.name}</b>: {point.y:.1f}%<br/>Outage: {point.baseOutage:.0f} min<br/>Sites: {point.baseSites:.0f}' 
                     },
                     plotOptions: {
-                        pie: {
-                            allowPointSelect: true,
-                            cursor: 'pointer',
-                            innerSize: '40%',
-                            dataLabels: {
-                                enabled: true,
-                                format: '<b>{point.name}</b>: {point.percentage:.1f}%',
-                                distance: 20,
-                                style: {
-                                    fontWeight: 'normal',
-                                    fontSize: '11px'
-                                },
-                                filter: {
-                                    property: 'percentage',
-                                    operator: '>',
-                                    value: 5
-                                }
-                            },
-                            showInLegend: true
+                        pie: { 
+                            innerSize: '60%', 
+                            dataLabels: { enabled: false }, 
+                            showInLegend: true 
                         }
                     },
-                    legend: {
-                        layout: 'vertical',
-                        align: 'right',
-                        verticalAlign: 'middle',
-                        itemStyle: { fontSize: '10px' }
+                    legend: { 
+                        layout: 'vertical', 
+                        align: 'right', 
+                        verticalAlign: 'middle', 
+                        itemStyle: { fontSize: '11px' } 
                     },
-                    credits: {
-                        enabled: false
+                    credits: { enabled: false },
+                    series: [{ name: 'Share', colorByPoint: true, data: seriesData }]
+                });
+            },
+
+            // NEW: Render individual tech trend chart showing exclusion values by category
+            renderTechTrendChart(containerId, tech, selectedDate) {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+
+                // Generate Last 10 Days Labels
+                const dates = [];
+                for (let i = 9; i >= 0; i--) {
+                    const d = new Date(selectedDate);
+                    d.setDate(d.getDate() - i);
+                    dates.push(d.toISOString().split('T')[0]);
+                }
+
+                const categories = ['Power', 'NOA', 'Non Telecom', 'PA / UA', 'Spare', 'Third Party', 'Others'];
+                
+                // Generate series data for each category showing calculated exclusion values
+                const series = categories.map((cat, index) => {
+                    const dataPoints = dates.map(date => {
+                        let exclusionValue = 0;
+                        
+                        if (MOCK_DB.processedData[date] && MOCK_DB.processedData[date].rows) {
+                            // Real data exists for this date
+                            const row = MOCK_DB.processedData[date].rows.find(r => r.category === cat);
+                            const tcha = parseFloat(MOCK_DB.processedData[date].tcha[tech]) || 98;
+                            
+                            if (row) {
+                                const mins = parseFloat(row.minutes[tech]) || 0;
+                                const totalOutage = MOCK_DB.processedData[date].techData[tech]?.totalOutage || 1;
+                                exclusionValue = tcha + (mins * (100 - tcha) / totalOutage);
+                            } else {
+                                exclusionValue = tcha;
+                            }
+                        } else {
+                            // Generate synthetic historical data with realistic variance
+                            const baseTCHA = MOCK_DB.processedData[selectedDate]?.tcha[tech] || 98;
+                            const variance = (Math.random() * 0.5) - 0.25; // Small variance for historical
+                            
+                            // Different categories have different typical exclusion impacts
+                            let impact = 0;
+                            if (cat === 'Power') impact = 0.3 + (Math.random() * 0.4);
+                            else if (cat === 'NOA') impact = 0.1 + (Math.random() * 0.2);
+                            else if (cat === 'Third Party') impact = 0.2 + (Math.random() * 0.3);
+                            else impact = 0.05 + (Math.random() * 0.15);
+                            
+                            exclusionValue = parseFloat(baseTCHA) + impact + variance;
+                        }
+                        
+                        return parseFloat(exclusionValue.toFixed(2));
+                    });
+                    
+                    return { 
+                        name: cat, 
+                        data: dataPoints,
+                        color: this.CATEGORY_COLORS[cat] || this.VISTA_COLORS[index],
+                        lineWidth: 2,
+                        marker: { 
+                            enabled: true,
+                            radius: 3
+                        }
+                    };
+                });
+
+                // Add TCHA target line (dashed)
+                const targetTCHA = MOCK_DB.processedData[selectedDate]?.tcha[tech] || 99;
+                series.push({
+                    name: 'TCHA Target',
+                    data: dates.map(() => parseFloat(targetTCHA)),
+                    color: '#2549A0',
+                    dashStyle: 'Dash',
+                    lineWidth: 2,
+                    marker: { enabled: false },
+                    tooltip: { pointFormat: '<b>{series.name}</b>: {point.y:.2f}%<br/>' }
+                });
+
+                Highcharts.chart(containerId, {
+                    chart: { 
+                        type: 'line', 
+                        backgroundColor: 'transparent', 
+                        height: 350,
+                        zoomType: 'xy'
                     },
-                    series: [{
-                        name: 'Outage %',
-                        colorByPoint: true,
-                        data: seriesData
-                    }]
+                    title: { text: null },
+                    subtitle: { 
+                        text: 'Showing calculated exclusion percentages by category',
+                        style: { fontSize: '11px', color: '#666' }
+                    },
+                    xAxis: { 
+                        categories: dates, 
+                        title: { text: 'Date' },
+                        labels: { rotation: -45, style: { fontSize: '10px' } }
+                    },
+                    yAxis: { 
+                        title: { text: 'Exclusion Value (%)' }, 
+                        min: parseFloat(targetTCHA) - 1,
+                        max: 100,
+                        plotLines: [{
+                            value: parseFloat(targetTCHA),
+                            color: '#2549A0',
+                            width: 1,
+                            dashStyle: 'dash',
+                            label: { text: 'Target', align: 'right' }
+                        }]
+                    },
+                    tooltip: { 
+                        shared: true, 
+                        valueSuffix: '%',
+                        headerFormat: '<b>{point.key}</b><br/>',
+                        pointFormat: '<span style="color:{series.color}">●</span> {series.name}: <b>{point.y:.2f}%</b><br/>'
+                    },
+                    plotOptions: { 
+                        line: { 
+                            marker: { enabled: true },
+                            states: { hover: { lineWidth: 3 } }
+                        } 
+                    },
+                    legend: { 
+                        layout: 'horizontal', 
+                        align: 'center', 
+                        verticalAlign: 'bottom',
+                        itemStyle: { fontSize: '10px' },
+                        itemWidth: 120
+                    },
+                    credits: { enabled: false },
+                    series: series
                 });
             }
         };
@@ -1150,9 +1301,10 @@
                 }
             },
             deleteUser(id) {
-                if(confirm('Are you sure?')) {
+                if(confirm('Are you sure you want to delete this user?')) {
                     MOCK_DB.users = MOCK_DB.users.filter(u => u.id !== id);
                     App.loadView('user-mgmt');
+                    Toast.show('User deleted', 'success');
                 }
             },
             renderLogs(logs) {
@@ -1173,9 +1325,9 @@
             filterLogs() {
                 const start = document.getElementById('log-start').value;
                 const end = document.getElementById('log-end').value;
-                if (!start || !end) {
-                    this.renderLogs(MOCK_DB.logs.slice(0, 100));
-                    return;
+                if (!start || !end) { 
+                    this.renderLogs(MOCK_DB.logs); 
+                    return; 
                 }
                 const filtered = MOCK_DB.logs.filter(l => {
                     const d = new Date(l.timestamp).toISOString().split('T')[0];
@@ -1185,25 +1337,117 @@
                 Toast.show(`Found ${filtered.length} logs`, 'success');
             },
             exportLogs() {
-                Toast.show('Exporting All Logs...', 'success');
+                this.downloadCSV(MOCK_DB.logs, 'system_logs.csv');
             },
             exportUserLog(userId) {
                 const user = MOCK_DB.users.find(u => u.id === userId);
-                const userLogs = MOCK_DB.logs.filter(l => l.userId === userId);
-                const filename = `User_Logs_${user.email}_${new Date().toISOString().split('T')[0]}.xlsx`;
-                Toast.show(`Exporting ${userLogs.length} logs for ${user.name}...`, 'success');
+                const logs = MOCK_DB.logs.filter(l => l.userId === userId);
+                this.downloadCSV(logs, `user_logs_${user.email}.csv`);
             },
-            downloadETLLog(date) {
-                const filename = `ETL_Log_${date}.txt`;
-                Toast.show(`Auto-downloading ${filename}...`, 'success');
+            downloadCSV(data, filename) {
+                if(!data.length) return;
+                const headers = Object.keys(data[0]).join(',');
+                const rows = data.map(row => Object.values(row).map(v => `"${v}"`).join(',')).join('\n');
+                const csvContent = "data:text/csv;charset=utf-8," + headers + '\n' + rows;
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", filename);
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            },
+            downloadETLLog(date, content) {
+                const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = `ETL_Log_${date}.txt`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
             },
             downloadResult() {
-                const filename = `Vista_Result_${STATE.selectedDate}.xlsx`;
-                Toast.show(`Downloading Result: ${filename}`, 'success');
+                const data = MOCK_DB.processedData[STATE.selectedDate];
+                if (!data) {
+                    Toast.show('No data available for selected date', 'error');
+                    return;
+                }
+                
+                // Create detailed CSV with both minutes and sites
+                const techs = ['2G', '3G', '4G', 'TDD', '5G'];
+                let csv = 'Category,Technology,Outage_Minutes,Affected_Sites,TCHA_Target,Calculated_Exclusion\n';
+                
+                // Base categories
+                data.rows.forEach(row => {
+                    techs.forEach(tech => {
+                        const mins = row.minutes[tech];
+                        const sites = row.sites[tech];
+                        const tcha = data.tcha[tech];
+                        const totalOutage = data.techData[tech].totalOutage;
+                        const exclusion = (parseFloat(tcha) + (parseFloat(mins) * (100 - parseFloat(tcha)) / totalOutage)).toFixed(2);
+                        
+                        csv += `"${row.category}","${tech}",${mins},${sites},${tcha},${exclusion}\n`;
+                    });
+                });
+                
+                // Custom rows
+                (data.customRows || []).forEach(row => {
+                    techs.forEach(tech => {
+                        const mins = row.minutes[tech];
+                        const sites = row.sites[tech];
+                        const tcha = data.tcha[tech];
+                        const totalOutage = data.techData[tech].totalOutage;
+                        const exclusion = (parseFloat(tcha) + (parseFloat(mins) * (100 - parseFloat(tcha)) / totalOutage)).toFixed(2);
+                        
+                        csv += `"${row.category} (Custom)","${tech}",${mins},${sites},${tcha},${exclusion}\n`;
+                    });
+                });
+                
+                const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = `Vista_Result_${STATE.selectedDate}.csv`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                Toast.show('Results downloaded as CSV', 'success');
             },
             downloadTickets() {
-                const filename = `Vista_CleanedTT_${STATE.selectedDate}.xlsx`;
-                Toast.show(`Downloading Tickets: ${filename}`, 'success');
+                const tickets = MOCK_DB.cleanedTickets[STATE.selectedDate];
+                if (!tickets || tickets.length === 0) {
+                    Toast.show('No ticket data available', 'error');
+                    return;
+                }
+                
+                this.downloadCSV(tickets, `Cleaned_Tickets_${STATE.selectedDate}.csv`);
+                Toast.show('Cleaned ticket data downloaded', 'success');
+            },
+            exportCharts() {
+                // Export all trend charts and donut charts
+                const techs = ['2G', '3G', '4G', 'TDD', '5G'];
+                let exported = 0;
+                
+                // Export trend charts
+                techs.forEach(tech => {
+                    const chart = Highcharts.charts.find(c => c && c.renderTo.id === `trend-chart-${tech}`);
+                    if (chart) {
+                        chart.exportChart({ type: 'image/png', filename: `Exclusion_Trend_${tech}_${STATE.selectedDate}`});
+                        exported++;
+                    }
+                });
+                
+                // Export donut charts
+                techs.forEach(tech => {
+                    const chart = Highcharts.charts.find(c => c && c.renderTo.id === `chart-${tech}`);
+                    if (chart) {
+                        chart.exportChart({ type: 'image/png', filename: `Outage_Distribution_${tech}_${STATE.selectedDate}`});
+                        exported++;
+                    }
+                });
+                
+                Toast.show(`Exported ${exported} charts`, 'success');
             }
         };
 
@@ -1237,27 +1481,25 @@
 
             addCustomRow() {
                 const data = MOCK_DB.processedData[STATE.selectedDate];
-                if (!data) {
-                    Toast.show('No data available for this date.', 'error');
-                    return;
-                }
+                if (!data) { Toast.show('No data available for this date.', 'error'); return; }
 
-                const cats = data.availableCategories || [];
+                const cats = data.availableCategories;
                 const checkboxes = cats.map(c => `
-                    <label class="checkbox-label" style="display:inline-flex; align-items:center; margin-right:15px;">
-                        <input type="checkbox" value="${c}" class="custom-cat-check"> ${c}
+                    <label class="checkbox-label">
+                        <input type="checkbox" value="${c}" class="custom-cat-check"> 
+                        <span>${c}</span>
                     </label>
                 `).join('');
 
                 this.createModal('Add Custom Exclusion Row',
                     `<div class="form-group">
                         <label class="form-label">Row Name</label>
-                        <input id="custom-row-name" class="form-input" placeholder="e.g. Power + NOA">
-                    </div>
-                    <div class="form-group">
+                        <input id="custom-row-name" class="form-input" placeholder="e.g. Infrastructure Issues">
+                     </div>
+                     <div class="form-group">
                         <label class="form-label">Select Categories to Combine</label>
-                        <div>${checkboxes}</div>
-                    </div>`,
+                        <div class="checkbox-grid">${checkboxes}</div>
+                     </div>`,
                     `<button class="btn btn-primary" id="add-custom-btn">Add Row</button>`
                 );
 
@@ -1266,154 +1508,204 @@
                     const selectedCats = Array.from(document.querySelectorAll('.custom-cat-check:checked')).map(cb => cb.value);
                     
                     if (!name || selectedCats.length === 0) {
-                        Toast.show('Please enter a name and select at least one category.', 'error');
+                        Toast.show('Enter a name and select at least one category.', 'error');
                         return;
                     }
 
-                    const vals = {};
-                    ['2G', '3G', '4G', 'TDD', '5G'].forEach(tech => {
-                        const combinedOutage = selectedCats.reduce((sum, cat) => {
-                            const chartItem = data.charts[tech].find(i => i.label === cat);
-                            return sum + (chartItem ? chartItem.baseOutage : 0);
-                        }, 0);
+                    const minutes = {};
+                    const sites = {};
+                    const techs = ['2G', '3G', '4G', 'TDD', '5G'];
+                    
+                    techs.forEach(tech => {
+                        // Sum up minutes and sites for selected categories
+                        let totalMins = 0;
+                        let totalSites = 0;
                         
-                        const total = data.techData[tech].totalOutage;
-                        const tcha = data.tcha[tech];
-                        const exclusion = tcha + (combinedOutage * (100 - tcha) / total);
-                        vals[tech] = exclusion.toFixed(2);
+                        selectedCats.forEach(cat => {
+                            // Find the base row for this category
+                            const baseRow = data.rows.find(r => r.category === cat);
+                            if (baseRow) {
+                                totalMins += parseInt(baseRow.minutes[tech]) || 0;
+                                totalSites += parseInt(baseRow.sites[tech]) || 0;
+                            }
+                        });
+                        
+                        minutes[tech] = totalMins;
+                        sites[tech] = totalSites;
                     });
 
-                    data.customRows.push({ category: name, vals });
+                    data.customRows.push({ 
+                        category: name, 
+                        minutes,
+                        sites,
+                        combinedCategories: selectedCats
+                    });
+                    
                     document.getElementById('modal-overlay').remove();
-                    Views.UserResults(document.getElementById('results-content'));
-                    Toast.show('Custom row added.', 'success');
+                    Views.renderResultsContent(document.getElementById('results-content'));
+                    Toast.show('Custom exclusion row added successfully.', 'success');
                 };
             },
-
-            forgotPassword() {
-                this.createModal('Forgot Password', 
-                    `<p>Please communicate with Admin to reset your password.</p>
-                     <p class="mt-4"><strong>Admin Contact:</strong> admin@iranvs.ir</p>`,
-                    `<button class="btn btn-primary" onclick="document.getElementById('modal-overlay')?.remove()">Close</button>`
-                );
-            },
-
-            forcePasswordChange(user) {
-                this.createModal('Change Password', 
-                    `<p>Welcome, ${user.name}. You must change your password on first login.</p>
-                     <input type="password" id="new-pw" class="form-input mt-4" placeholder="New Password">`,
-                    `<button class="btn btn-primary" id="confirm-pw-change">Update</button>`
-                );
-                
-                document.getElementById('confirm-pw-change').onclick = () => {
-                    const newPw = document.getElementById('new-pw');
-                    if(newPw && newPw.value) {
-                        user.password = newPw.value;
-                        user.forcePwChange = false;
-                        document.getElementById('modal-overlay')?.remove();
-                        Auth.completeLogin(user);
-                    }
-                };
-            },
-
-            createUser() {
-                this.createModal('Create User', 
-                    `<div class="form-group"><label>Email (@iranvs.ir)</label><input id="new-email" class="form-input" type="email" placeholder="name@iranvs.ir"></div>`,
-                    `<button class="btn btn-primary" id="add-user-btn">Create</button>`
-                );
-                
-                document.getElementById('add-user-btn').onclick = () => {
-                    const email = document.getElementById('new-email');
-                    if(email && email.value) {
-                        MOCK_DB.users.push({
-                            id: Date.now(),
-                            name: email.value.split('@')[0],
-                            email: email.value,
-                            password: '1qaz!QAZ',
-                            role: 'user',
-                            status: 'active',
-                            forcePwChange: true
-                        });
-                        document.getElementById('modal-overlay')?.remove();
-                        App.loadView('user-mgmt');
-                        Toast.show('User created with default password.', 'success');
-                    }
-                };
-            },
-
-            resetPw(id) {
-                const user = MOCK_DB.users.find(u => u.id === id);
-                if (user) {
-                    user.password = '1qaz!QAZ';
-                    user.forcePwChange = true;
-                    Toast.show('Password reset to default.', 'success');
-                }
-            },
-
             uploadSubRoot() {
-                this.createModal('Upload SubRootcuz.xlsx', 
-                    `<p>This file is used for ETL lookup process.</p>
-                     <input type="file" class="form-input mt-4">`,
-                    `<button class="btn btn-primary" id="subroot-upload-btn">Save</button>`
+                this.createModal('Upload SubRootcuz.xlsx',
+                    `<p>Upload the lookup file used for categorizing outages. This file maps specific error codes to root cause categories.</p>
+                     <div class="form-group">
+                        <input type="file" id="subroot-file" class="form-input" accept=".xlsx, .xls">
+                     </div>`,
+                    `<button class="btn btn-primary" id="subroot-upload-btn">Save File</button>`
                 );
                 
                 document.getElementById('subroot-upload-btn').onclick = () => {
-                    document.getElementById('modal-overlay')?.remove();
-                    Toast.show('SubRootcuz file updated.', 'success');
+                    const input = document.getElementById('subroot-file');
+                    if(input.files.length > 0) {
+                        MOCK_DB.subRootcuzFile = input.files[0];
+                        document.getElementById('modal-overlay').remove();
+                        Toast.show('SubRootcuz file updated successfully.', 'success');
+                        if(STATE.currentView === 'data-upload') {
+                             Views.DataUpload(document.getElementById('view-content'));
+                        }
+                    } else {
+                        Toast.show('Please select a file.', 'error');
+                    }
                 };
             },
-
+            forgotPassword() {
+                this.createModal('Forgot Password', 
+                    `<p>Please contact your system administrator to reset your password.</p>
+                     <p style="margin-top: 10px; font-size: 13px; color: #666;">
+                        Admin Email: admin@iranvs.ir
+                     </p>`, 
+                    `<button class="btn btn-primary" onclick="document.getElementById('modal-overlay').remove()">Close</button>`
+                );
+            },
+            forcePasswordChange(user) {
+                this.createModal('Change Password', 
+                    `<p>Welcome, ${user.name}. For security reasons, please change your password.</p>
+                     <div class="form-group">
+                        <label>New Password</label>
+                        <input type="password" id="new-pw" class="form-input" placeholder="Enter new password">
+                     </div>
+                     <div class="form-group">
+                        <label>Confirm Password</label>
+                        <input type="password" id="confirm-pw" class="form-input" placeholder="Confirm new password">
+                     </div>`,
+                    `<button class="btn btn-primary" id="confirm-pw-change">Update Password</button>`
+                );
+                document.getElementById('confirm-pw-change').onclick = () => {
+                    const newPw = document.getElementById('new-pw').value;
+                    const confirmPw = document.getElementById('confirm-pw').value;
+                    
+                    if(!newPw || !confirmPw) {
+                        Toast.show('Please fill in both fields', 'error');
+                        return;
+                    }
+                    if(newPw !== confirmPw) {
+                        Toast.show('Passwords do not match', 'error');
+                        return;
+                    }
+                    if(newPw.length < 6) {
+                        Toast.show('Password must be at least 6 characters', 'error');
+                        return;
+                    }
+                    
+                    user.password = newPw;
+                    user.forcePwChange = false;
+                    document.getElementById('modal-overlay').remove();
+                    Auth.completeLogin(user);
+                };
+            },
+            createUser() {
+                this.createModal('Create New User', 
+                    `<div class="form-group">
+                        <label>Full Name</label>
+                        <input id="new-name" class="form-input" type="text" placeholder="John Doe">
+                     </div>
+                     <div class="form-group">
+                        <label>Email (@iranvs.ir)</label>
+                        <input id="new-email" class="form-input" type="email" placeholder="user@iranvs.ir">
+                     </div>`,
+                    `<button class="btn btn-primary" id="add-user-btn">Create User</button>`
+                );
+                document.getElementById('add-user-btn').onclick = () => {
+                    const email = document.getElementById('new-email').value;
+                    const name = document.getElementById('new-name').value || email.split('@')[0];
+                    
+                    if(!email || !email.endsWith('@iranvs.ir')) {
+                        Toast.show('Please enter a valid @iranvs.ir email', 'error');
+                        return;
+                    }
+                    
+                    if(MOCK_DB.users.find(u => u.email === email)) {
+                        Toast.show('User already exists', 'error');
+                        return;
+                    }
+                    
+                    MOCK_DB.users.push({
+                        id: Date.now(), 
+                        name: name, 
+                        email: email,
+                        password: '1qaz!QAZ', 
+                        role: 'user', 
+                        status: 'active', 
+                        forcePwChange: true
+                    });
+                    document.getElementById('modal-overlay').remove();
+                    App.loadView('user-mgmt');
+                    Toast.show('User created successfully. Default password: 1qaz!QAZ', 'success');
+                };
+            },
+            resetPw(id) {
+                const user = MOCK_DB.users.find(u => u.id === id);
+                if (user) {
+                    if(confirm(`Reset password for ${user.email}?`)) {
+                        user.password = '1qaz!QAZ';
+                        user.forcePwChange = true;
+                        Toast.show('Password reset to default. User must change on next login.', 'success');
+                    }
+                }
+            },
             devInfo() {
                 this.createModal('Developer Info', 
-                    `<div style="text-align: left; font-size: 13px;">
-                        <p><strong>Docker & Postgres Info:</strong></p>
-                        <pre>
-version: '3'
-services:
-  db:
-    image: postgres:13
-    environment:
-      POSTGRES_DB: vista_db
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: secret
-  web:
-    build: .
-    ports:
-      - "5000:5000"
-    depends_on:
-      - db</pre>
-                    </div>`,
-                    `<button class="btn btn-primary" onclick="document.getElementById('modal-overlay')?.remove()">Close</button>`
+                    `<div style="font-size: 13px; color: #555; line-height: 1.6;">
+                        <strong>Frontend Architecture:</strong><br>
+                        • Single Page Application (Vanilla ES6+)<br>
+                        • Modular JavaScript Pattern<br>
+                        • Highcharts.js for Visualization<br>
+                        • CSS Grid & Flexbox Layouts<br><br>
+                        
+                        <strong>Data Model:</strong><br>
+                        • In-Memory Mock Database<br>
+                        • Date-keyed Processed Data Storage<br>
+                        • Dual Metric Tracking (Minutes + Sites)<br><br>
+                        
+                        <strong>Backend Integration Ready:</strong><br>
+                        • REST API placeholder architecture<br>
+                        • Export to CSV/JSON functionality<br>
+                        • File upload simulation
+                     </div>`,
+                    `<button class="btn btn-primary" onclick="document.getElementById('modal-overlay').remove()">Close</button>`
                 );
             }
         };
 
-        /* --- TOAST --- */
         const Toast = {
             show(msg, type = 'success') {
                 const container = document.getElementById('toast-container');
-                if (!container) return;
-                
                 const el = document.createElement('div');
                 el.className = `toast ${type}`;
-                el.innerHTML = `<span>${type === 'success' ? '✔' : '✖'}</span> ${msg}`;
+                el.innerHTML = `<span style="font-size: 16px;">${type === 'success' ? '✔' : '✖'}</span> ${msg}`;
                 container.appendChild(el);
-                setTimeout(() => {
-                    if (el.parentNode === container) {
-                        container.removeChild(el);
-                    }
+                setTimeout(() => { 
+                    if(el.parentNode) el.parentNode.removeChild(el); 
                 }, 3000);
             }
         };
 
         window.Actions = Actions;
         window.Modals = Modals;
-
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => App.init());
-        } else {
-            App.init();
-        }
+        
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => App.init());
+        else App.init();
     </script>
 </body>
 </html>
