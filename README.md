@@ -1,49 +1,228 @@
-README: Daily TCHA & Outage Analysis
-Overview
-This Jupyter notebook processes daily incident ticket data to calculate Mean Time to Repair (MTTR) metrics and generate Technology Health Analysis (TCHA) reports with outage summaries across multiple network technologies (2G, 3G, 4G, 5G, TDD).
+# Vista Service Daily TCHA Exclusion System
 
-Features
-Data Processing: Cleans and standardizes incident ticket data including fault times, recovery times, and site counts
+## 📋 Project Overview
 
-MTTR Calculation: Computes repair times with proper date boundary handling
+**Vista Service Daily TCHA Exclusion** is a web-based dashboard application designed for telecommunications network performance monitoring and management. The system enables NPM teams to analyze and exclude TCHA (Total Cell Hours of Availability) outages across different network technologies (2G, 3G, 4G, TDD, 5G) while categorizing incidents by root causes.
 
-Category Mapping: Enriches data with categories from a lookup table (SubRootcuz.xlsx)
+### **Core Purpose**
+Transform raw incident ticket data into actionable insights by calculating TCHA exclusions based on outage categories, enabling accurate network availability reporting.
 
-Outage Analysis: Calculates technology-specific outage metrics
+---
 
-TCHA Reporting: Generates formatted summary reports for each technology with exclusion calculations
+## 🎯 Key Features
 
-Input Files
-Incident Ticket Data: Excel file containing daily incident records
+### **1. Authentication & Security System**
+- **Role-based access control** (Admin/User roles)
+- **Secure login** with @iranvs.ir domain restriction
+- **Password policies** with forced password change on first login
+- **Auto-logout** after 10 minutes of inactivity
+- **Account status management** (active/inactive)
 
-SubRootcuz.xlsx: Lookup table mapping Root Cause/Sub Cause to categories
+### **2. Admin Dashboard**
+- **Real-time system statistics** display
+- **Activity logging** with date filtering capabilities
+- **User management** with CRUD operations
+- **Export functionality** for logs and user activities
 
-Output Files
-result.xlsx: Processed data with all calculated columns
+### **3. Data Upload & ETL Processing**
+- **Excel file upload** for incident ticket data
+- **Technology-specific TCHA target input** (2G, 3G, 4G, TDD, 5G)
+- **Simulated ETL pipeline** with real-time logging
+- **SubRootcuz.xlsx lookup file** integration
+- **Automated outage calculation** based on TCHA targets
 
-In-memory DataFrames: Technology-specific summary tables (2G, 3G, 4G, 5G, TDD)
+### **4. Results Visualization**
+- **Technology-wise outage summary tables**
+- **Interactive Highcharts donut charts** for outage distribution
+- **Custom row creation** for combined category analysis
+- **Date-based data filtering**
+- **Responsive grid layout** for multi-technology comparison
 
-Key Calculations
-MTTR: Time difference between fault occurrence and recovery
+### **5. Data Analysis Features**
+- **Categorized outage analysis** (Power, NOA, Non Telecom, PA/UA, Spare, Third Party, Others)
+- **Technology-specific algorithms** for outage distribution
+- **Custom exclusion rows** for combined category analysis
+- **Export capabilities** for results and cleaned ticket data
 
-Outage Metrics: Site-seconds outage by technology
+---
 
-Exclusion Formulas: TCHA adjustments based on category-specific outages
+## 🏗️ Architecture & Technologies
 
-Data Filtering: Removes ER-category tickets and empty site provinces
+### **Frontend Stack**
+- **Pure HTML/CSS/JavaScript** (No external frameworks)
+- **Highcharts.js** for data visualization
+- **CSS Grid & Flexbox** for responsive layouts
+- **Modular JavaScript** architecture with clear separation of concerns
 
-Usage
-Configure file paths and target date in the Configuration section
+### **Application Architecture**
+```
+App
+├── Auth Controller (Authentication & Authorization)
+├── Views Controller (UI Rendering)
+├── ETL Service (Data Processing)
+├── Charts Service (Visualization)
+├── Actions Controller (Business Logic)
+├── Modals Controller (Dialog Management)
+└── Logger Service (Activity Tracking)
+```
 
-Run all cells sequentially
+### **Mock Database Structure**
+```javascript
+MOCK_DB = {
+  users: [],      // User accounts with roles
+  logs: [],       // System activity logs
+  processedData: {} // Date-keyed analysis results
+}
+```
 
-Check output for processing logs and summary statistics
+---
 
-Access result.xlsx for detailed data and summary DataFrames for reports
+## 🎨 UI/UX Design Features
 
-Dependencies
-pandas
+### **Professional Navigation**
+- **Custom tabbed interface** with visual separators
+- **Role-specific navigation** (Admin sees all tabs, User sees only Results)
+- **Active state highlighting** with bottom border indicators
+- **User profile display** with role badge
 
-openpyxl
+### **Dashboard Components**
+- **Stat cards** with hover effects
+- **Collapsible ETL log display**
+- **Modal dialogs** with backdrop blur
+- **Toast notifications** for system feedback
+- **Responsive tables** with horizontal scrolling
 
-datetime
+### **Color Scheme**
+- **Primary Blue**: `#2549A0` (Vista brand color)
+- **Accent Green**: `#78DD12` (Success/actions)
+- **Neutral Grays**: For backgrounds and text
+- **Technology-specific colors** for chart differentiation
+
+---
+
+## 🔧 Technical Implementation
+
+### **Key Algorithms**
+1. **Outage Distribution Algorithm**
+   - Technology-specific weighting factors
+   - Category-based outage calculation
+   - TCHA-target influenced results
+
+2. **ETL Simulation**
+   - Step-by-step process visualization
+   - Mock data generation with realistic distributions
+   - Technology-characteristic modeling
+
+3. **Chart Generation**
+   - Consistent color mapping across technologies
+   - Percentage-based donut charts
+   - Interactive tooltips with detailed data
+
+### **State Management**
+- **Global STATE object** for session management
+- **Date-based data segregation**
+- **User role persistence**
+
+### **Security Features**
+- **Input validation** on all forms
+- **Activity logging** for audit trails
+- **Session timeout** with user activity tracking
+- **Role-based view restrictions**
+
+---
+
+## 📊 Data Flow
+
+```
+1. Admin Uploads Data
+   ↓
+2. User Inputs TCHA Targets per Technology
+   ↓
+3. ETL Process Simulates Data Processing
+   ↓
+4. System Generates Outage Distribution Models
+   ↓
+5. Results Displayed in Tables & Charts
+   ↓
+6. Users Can Add Custom Exclusion Rows
+   ↓
+7. Final Results Available for Export
+```
+
+---
+
+## 🚀 Deployment & Development
+
+### **Development Notes**
+- **Single HTML file** deployment
+- **No external dependencies** beyond Highcharts CDN
+- **In-memory database** for prototype purposes
+- **Ready for backend integration** with REST API
+
+### **Future Integration Points**
+```yaml
+Backend Integration:
+  - PostgreSQL database
+  - Docker containerization
+  - REST API endpoints
+  - Real file upload processing
+  
+Production Features:
+  - Actual Excel file parsing
+  - Database persistence
+  - User authentication server
+  - Scheduled ETL jobs
+```
+
+### **Demo Credentials**
+```
+Admin: admin@iranvs.ir / 1qaz!QAZ
+User:  user@iranvs.ir / 1qaz!QAZ
+```
+
+---
+
+## 📈 Business Value
+
+### **For Network Operations**
+- **Accurate TCHA reporting** with proper exclusions
+- **Root cause analysis** of network outages
+- **Technology performance comparison**
+- **Historical trend analysis**
+
+### **For Management**
+- **Single source of truth** for network availability
+- **Standardized reporting** across technologies
+- **Audit trail** of all calculations and changes
+- **Customizable analysis** with combined categories
+
+---
+
+## 🔮 Future Enhancements
+
+### **Planned Features**
+1. **Real database integration** with PostgreSQL
+2. **Actual Excel file processing** (xlsx parsing)
+3. **Automated scheduled reports**
+4. **Multi-tenant support** for different regions
+5. **Advanced analytics** with trend prediction
+6. **Mobile-responsive design** improvements
+7. **API endpoints** for third-party integration
+
+### **Scalability Considerations**
+- **Modular architecture** ready for component extraction
+- **Service separation** potential (Auth, ETL, API)
+- **Cloud deployment** ready with Docker configuration
+- **Performance optimization** for large datasets
+
+---
+
+## 📝 Conclusion
+
+The **Vista Service Daily TCHA Exclusion System** represents a comprehensive solution for telecommunications network performance analysis. By combining intuitive data upload, sophisticated ETL simulation, and powerful visualization tools, it empowers NPM teams to accurately calculate and report network availability while identifying key areas for operational improvement.
+
+The prototype demonstrates full functionality with a clean, professional interface and is production-ready with backend integration.
+
+---
+
+*Last Updated: Prototype v1.0 | For NPM Team Use | Vista Services Platform*
